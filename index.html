@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>✨═━☆ Chillverse ☆━═✨</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #0d0d0d, #000);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  .widget {
+    background: rgba(25, 25, 25, 0.75);
+    border-radius: 20px;
+    max-width: 400px;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 20px #7f00ff55;
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  
+  .widget::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, #7f00ff, #ff00ff, #00ffff, #ffdd00, #7f00ff);
+    background-size: 400% 400%;
+    animation: borderMove 12s linear infinite;
+
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                  linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+  @keyframes borderMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .server-pfp {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #ffdd00;
+    margin-bottom: 10px;
+    animation: pulse 3s infinite ease-in-out;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ffdd0088; }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px #ffdd00aa; }
+  }
+
+  .header {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #ffdd00;
+    text-shadow: 0 0 8px #7f00ff, 0 0 14px #ff00ff;
+  }
+
+  .description {
+    font-size: 14px;
+    color: #ddd;
+    margin-bottom: 18px;
+    line-height: 1.5;
+    animation: fadeIn 1.2s ease forwards;
+  }
+
+  .section h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #00ffff;
+    text-shadow: 0 0 5px #7f00ff;
+    font-weight: 600;
+  }
+
+  #online-count {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #ffdd00;
+    text-shadow: 0 0 5px #7f00ff;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    max-height: 180px;
+    overflow-y: auto;
+    margin: 0 auto 18px auto;
+    animation: fadeIn 1.5s ease forwards;
+  }
+  ul::-webkit-scrollbar { width: 6px; }
+  ul::-webkit-scrollbar-thumb {
+    background: #7f00ff;
+    border-radius: 6px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #161616, #1f1f1f);
+    box-shadow: 0 0 5px #7f00ff33;
+    font-size: 14px;
+    transition: 0.25s ease;
+    opacity: 0;
+    transform: translateX(-15px);
+    animation: slideIn 0.5s ease forwards;
+  }
+  li:nth-child(n) { animation-delay: calc(0.05s * var(--i)); }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  li:hover {
+    transform: translateX(6px) scale(1.02);
+    box-shadow: 0 0 12px #ff00ff99;
+    background: linear-gradient(145deg, #2a0a50, #3b0b70);
+  }
+  li img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 8px;
+    border: 2px solid #7f00ff;
+  }
+
+  .join-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #7f00ff, #ff00ff);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 10px;
+    transition: 0.3s;
+    box-shadow: 0 0 18px #7f00ff55;
+    animation: pulseBtn 2.5s infinite ease-in-out;
+  }
+  .join-btn:hover {
+    background: linear-gradient(135deg, #ff00ff, #7f00ff);
+    transform: scale(1.08);
+    box-shadow: 0 0 25px #ff00ffaa;
+  }
+  @keyframes pulseBtn {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 15px #7f00ff77; }
+    50% { transform: scale(1.05); box-shadow: 0 0 22px #ff00ffbb; }
+  }
+
+  @media (max-width: 480px) {
+    .widget { max-width: 90%; padding: 16px; }
+    .header { font-size: 20px; }
+    .description { font-size: 13px; }
+    .join-btn { font-size: 14px; padding: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <img src="pfp.jfif" alt="Chillverse PFP" class="server-pfp">
+  <div class="header">✨═━☆ Chillverse ☆━═✨</div>
+
+  <div class="description">
+    Welcome to <b>✨═━☆ Chillverse ☆━═✨</b> — where <span style="color:#ffdd00;">vibes flow</span>, voices echo, and friendships spark.  
+    Relax, explore, and let the chill take over. 🌌
+  </div>
+
+  <div class="section">
+    <h3>🟢 Online Members</h3>
+    <div id="online-count">Loading...</div>
+    <ul id="member-list"></ul>
+  </div>
+
+  <a class="join-btn" href="#" id="join-btn" target="_blank">Join Chillverse</a>
+</div>
+
+<script>
+const serverID = "1413927989481308192";
+const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
+const fallbackInvite = "https://discord.gg/YOUR_INVITE_HERE"; 
+
+function loadWidget() {
+  fetch(apiURL)
+    .then(res => res.json())
+    .then(data => {
+      // Online count
+      const countEl = document.getElementById("online-count");
+      countEl.textContent = data.presence_count
+        ? `Online Now: ${data.presence_count} members`
+        : "Online count unavailable";
+
+      
+      const memberList = document.getElementById("member-list");
+      memberList.innerHTML = "";
+      if (data.members && data.members.length > 0) {
+        data.members.forEach((member, i) => {
+          const li = document.createElement("li");
+          li.style.setProperty("--i", i); 
+          const avatar = document.createElement("img");
+          avatar.src = member.avatar_url || "pfp.webp";
+          const name = document.createElement("span");
+          name.textContent = member.username;
+          li.appendChild(avatar);
+          li.appendChild(name);
+          memberList.appendChild(li);
+        });
+      } else {
+        memberList.innerHTML = "<li style='color:#888;'>No members online</li>";
+      }
+
+     
+      const joinBtn = document.getElementById("join-btn");
+      joinBtn.href = data.instant_invite || fallbackInvite;
+    })
+    .catch(err => {
+      console.error("Failed to fetch widget data:", err);
+      document.getElementById("online-count").textContent = "Error loading online count";
+      document.getElementById("member-list").innerHTML = "<li style='color:#888;'>Failed to load members</li>";
+      document.getElementById("join-btn").href = fallbackInvite;
+    });
+}
+
+
+loadWidget();
+setInterval(loadWidget, 15000);
+</script>
+</body>
+</html>
