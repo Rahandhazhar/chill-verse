@@ -30,7 +30,6 @@
     animation: fadeIn 1s ease forwards;
   }
 
-  
   .widget::before {
     content: "";
     position: absolute;
@@ -40,12 +39,9 @@
     background: linear-gradient(135deg, #7f00ff, #ff00ff, #00ffff, #ffdd00, #7f00ff);
     background-size: 400% 400%;
     animation: borderMove 12s linear infinite;
-
-    -webkit-mask: linear-gradient(#000 0 0) content-box,
-                  linear-gradient(#000 0 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box,
-          linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite: exclude;
   }
   @keyframes borderMove {
@@ -59,12 +55,13 @@
   }
 
   .server-pfp {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     border: 3px solid #ffdd00;
     margin-bottom: 10px;
     animation: pulse 3s infinite ease-in-out;
+    object-fit: cover;
   }
   @keyframes pulse {
     0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ffdd0088; }
@@ -84,7 +81,6 @@
     color: #ddd;
     margin-bottom: 18px;
     line-height: 1.5;
-    animation: fadeIn 1.2s ease forwards;
   }
 
   .section h3 {
@@ -108,7 +104,6 @@
     max-height: 180px;
     overflow-y: auto;
     margin: 0 auto 18px auto;
-    animation: fadeIn 1.5s ease forwards;
   }
   ul::-webkit-scrollbar { width: 6px; }
   ul::-webkit-scrollbar-thumb {
@@ -131,11 +126,9 @@
     animation: slideIn 0.5s ease forwards;
   }
   li:nth-child(n) { animation-delay: calc(0.05s * var(--i)); }
-
   @keyframes slideIn {
     to { opacity: 1; transform: translateX(0); }
   }
-
   li:hover {
     transform: translateX(6px) scale(1.02);
     box-shadow: 0 0 12px #ff00ff99;
@@ -183,7 +176,7 @@
 </head>
 <body>
 <div class="widget">
-  <img src="pfp.jfif" alt="Chillverse PFP" class="server-pfp">
+  <img id="server-icon" src="pfp.jfif" alt="Chillverse PFP" class="server-pfp">
   <div class="header">✨═━☆ Chillverse ☆━═✨</div>
 
   <div class="description">
@@ -203,25 +196,31 @@
 <script>
 const serverID = "1413927989481308192";
 const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
-const fallbackInvite = "https://discord.gg/YOUR_INVITE_HERE"; 
+const fallbackInvite = "https://discord.gg/YOUR_INVITE_HERE"; // <-- Replace with permanent invite
 
 function loadWidget() {
   fetch(apiURL)
     .then(res => res.json())
     .then(data => {
       // Online count
-      const countEl = document.getElementById("online-count");
-      countEl.textContent = data.presence_count
-        ? `Online Now: ${data.presence_count} members`
-        : "Online count unavailable";
+      document.getElementById("online-count").textContent =
+        data.presence_count
+          ? `Online Now: ${data.presence_count} members`
+          : "Online count unavailable";
 
-      
+      // Server icon
+      if (data.icon) {
+        const iconURL = `https://cdn.discordapp.com/icons/${serverID}/${data.icon}.png?size=128`;
+        document.getElementById("server-icon").src = iconURL;
+      }
+
+      // Members
       const memberList = document.getElementById("member-list");
       memberList.innerHTML = "";
       if (data.members && data.members.length > 0) {
         data.members.forEach((member, i) => {
           const li = document.createElement("li");
-          li.style.setProperty("--i", i); 
+          li.style.setProperty("--i", i);
           const avatar = document.createElement("img");
           avatar.src = member.avatar_url || "pfp.webp";
           const name = document.createElement("span");
@@ -234,9 +233,9 @@ function loadWidget() {
         memberList.innerHTML = "<li style='color:#888;'>No members online</li>";
       }
 
-     
-      const joinBtn = document.getElementById("join-btn");
-      joinBtn.href = data.instant_invite || fallbackInvite;
+      // Join button
+      document.getElementById("join-btn").href =
+        data.instant_invite || fallbackInvite;
     })
     .catch(err => {
       console.error("Failed to fetch widget data:", err);
@@ -246,7 +245,7 @@ function loadWidget() {
     });
 }
 
-
+// Initial load + refresh every 15s
 loadWidget();
 setInterval(loadWidget, 15000);
 </script>
