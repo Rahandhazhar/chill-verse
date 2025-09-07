@@ -21,29 +21,24 @@
   html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;}
   body{display:flex;align-items:center;justify-content:center;background: var(--bg);color:#fff;padding:28px;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
 
-  /* stage holds parallax layers and the widget */
   .stage{position:relative;width:var(--width);max-width:92vw;height:auto;padding:10px}
-
-  /* parallax layers (subtle glass cards) */
   .layer{position:absolute;inset:6px;border-radius:18px;pointer-events:none;z-index:0;opacity:0.55;transform:translate3d(0,0,0)}
   .layer.l1{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);box-shadow:0 12px 40px rgba(0,0,0,0.45);filter:blur(6px)}
   .layer.l2{inset:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);transform-origin:center}
   .layer.l3{inset:18px;background:linear-gradient(180deg,rgba(255,255,255,0.008),transparent)}
 
   canvas#starfield{position:absolute;inset:6px;border-radius:16px;z-index:0;pointer-events:none}
+  canvas#burst{position:absolute;inset:6px;border-radius:16px;z-index:5;pointer-events:none}
 
-  .widget{position:relative;z-index:2;width:100%;max-width:var(--width);border-radius:18px;padding:18px 18px 16px 18px;background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.18));box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px var(--accent)22;backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
-
+  .widget{position:relative;z-index:2;width:100%;max-width:var(--width);border-radius:18px;padding:18px 18px 16px 18px;background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.18));box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px var(--accent)22;backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);overflow:hidden;border:1px solid rgba(255,255,255,0.03);transition:transform .18s ease}
   .widget::before{content:'';position:absolute;inset:-2px;border-radius:20px;padding:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--highlight),var(--accent));background-size:300% 300%;animation:slide 12s linear infinite;mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:1}
   @keyframes slide{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
   .top{display:flex;gap:12px;align-items:center;margin-bottom:12px;position:relative;z-index:2}
-
-  /* avatar with SVG ring */
   .pfp-wrap{width:90px;height:90px;border-radius:50%;position:relative;flex-shrink:0}
-  .pfp{width:90px;height:90px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);border:3px solid rgba(255,221,0,0.9)}
+  .pfp{width:90px;height:90px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);border:3px solid rgba(255,221,0,0.9);transition:filter .25s ease, transform .25s ease}
   .pfp img{width:100%;height:100%;object-fit:cover;display:block}
-  .pfp-svg{position:absolute;left:0;top:0;width:90px;height:90px;pointer-events:none}
+  .pfp-svg{position:absolute;left:0;top:0;width:90px;height:90px;pointer-events:none;transition:filter .2s ease, transform .2s ease}
 
   .title{flex:1;text-align:left}
   .title h1{margin:0;font-size:20px;letter-spacing:0.4px;color:var(--highlight);text-shadow:0 0 8px var(--accent)}
@@ -52,9 +47,8 @@
   .meta{display:flex;gap:10px;align-items:center;margin-top:14px;z-index:2}
   .count-card{background:var(--glass);padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:10px;box-shadow:inset 0 -6px 18px rgba(0,0,0,0.35)}
   .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--accent),var(--accent-2));box-shadow:0 0 8px var(--accent);}
-  #online-count{font-weight:700;font-size:16px;color:#fff}
+  #online-count{font-weight:700;font-size:16px;color:#fff;min-width:90px}
 
-  /* sparkline */
   .sparkline{width:120px;height:36px;border-radius:6px;background:transparent}
 
   .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
@@ -74,24 +68,33 @@
 
   #updatedAt{color:var(--muted);font-size:12px}
 
+  /* privacy mode styles */
+  .privacy .pfp{filter:blur(6px) grayscale(0.25) brightness(0.6)}
+  .privacy #online-count{color:transparent;text-shadow:none}
+  .privacy .sparkline{display:none}
+  .privacy .dot{opacity:0.35}
+
+  /* ring heartbeat animation */
+  @keyframes ringBeat{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+
   @media (prefers-reduced-motion: reduce){.widget::before,canvas#starfield,.pfp-svg{animation:none!important;transition:none!important}.skeleton{animation:none}}
   @media (max-width:420px){:root{--width:92vw}.top{flex-direction:row}.pfp{width:72px;height:72px}.pfp-svg{width:72px;height:72px}.title h1{font-size:18px}}
 </style>
 </head>
 <body>
   <div class="stage" role="region" aria-label="Chillverse server widget">
-    <!-- parallax glass layers -->
     <div class="layer l1"></div>
     <div class="layer l2"></div>
     <div class="layer l3"></div>
 
     <canvas id="starfield" width="720" height="480" aria-hidden="true"></canvas>
+    <!-- burst canvas for sparkle bursts -->
+    <canvas id="burst" width="720" height="480" aria-hidden="true"></canvas>
 
     <div class="widget" role="article" id="widgetRoot">
       <div class="top">
         <div class="pfp-wrap" aria-hidden="true">
           <div class="pfp"><img src="pfp.jfif" alt="Chillverse" /></div>
-          <!-- SVG ring: stroke length will be adjusted via JS based on online percent -->
           <svg class="pfp-svg" viewBox="0 0 100 100" aria-hidden="true">
             <defs>
               <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="0%">
@@ -112,6 +115,9 @@
         <div class="actions" aria-hidden="true">
           <div class="theme-picker" title="Theme">
             <button class="btn ghost small" id="themeBtn" aria-label="Change theme">Theme</button>
+          </div>
+          <div style="margin-left:6px">
+            <button class="btn small ghost" id="privacyBtn" title="Toggle privacy mode" aria-pressed="false">Privacy</button>
           </div>
         </div>
       </div>
@@ -161,11 +167,7 @@
   const serverID = '1413927989481308192';
   const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
   const fallbackInvite = 'https://discord.gg/YOUR_INVITE_HERE';
-
-  // Optional server endpoint that creates a time-limited invite. If you want auto-expiring invites,
-  // implement a server endpoint that returns: { invite: 'https://discord.gg/abc', expires_in: 300 }
-  const tempInviteEndpoint = '/api/generate-invite'; // <--- replace with your real endpoint or leave as-is for fallback
-
+  const tempInviteEndpoint = '/api/generate-invite';
   const cacheKey = 'chillverse.widget.cache.v2';
   const historyKey = 'chillverse.widget.history';
   const HISTORY_LENGTH = 30;
@@ -185,56 +187,52 @@
   const sparkCtx = sparkCanvas.getContext('2d');
   const stage = document.querySelector('.stage');
   const widgetRoot = document.getElementById('widgetRoot');
+  const burstCanvas = document.getElementById('burst');
+  const burstCtx = burstCanvas.getContext('2d');
 
   /* ----------------- State ----------------- */
   let currentInvite = fallbackInvite;
-  let tempInviteExpiry = null; // timestamp
+  let tempInviteExpiry = null;
   let history = loadHistory();
+  let privacyMode = loadPrivacy();
+  if(privacyMode) document.documentElement.classList.add('privacy');
+
+  function loadPrivacy(){ try{ return JSON.parse(localStorage.getItem('chill.privacy')||'false'); }catch(e){return false} }
+  function savePrivacy(v){ try{ localStorage.setItem('chill.privacy', JSON.stringify(!!v)); }catch(e){} }
 
   /* ----------------- Helpers ----------------- */
   function now(){ return Date.now(); }
   function loadHistory(){ try{ const j = localStorage.getItem(historyKey); if(j) return JSON.parse(j).slice(-HISTORY_LENGTH); }catch(e){}; return Array(HISTORY_LENGTH).fill(0); }
   function saveHistory(){ try{ localStorage.setItem(historyKey, JSON.stringify(history)); }catch(e){} }
 
-  function showOnlineText(text){ if(onlineEl.querySelector('.skeleton')){ onlineEl.innerHTML = ''; } const prev = onlineEl.textContent; if(prev === text) return; onlineEl.style.opacity = 0; setTimeout(()=>{ onlineEl.textContent = text; onlineEl.style.transition = 'opacity 300ms'; onlineEl.style.opacity = 1 }, 180); }
+  function showOnlineText(text){ if(onlineEl.querySelector('.skeleton')){ onlineEl.innerHTML = ''; } const prev = onlineEl.textContent; if(prev === text) return; if(privacyMode){ onlineEl.textContent = 'Hidden'; return; } onlineEl.style.opacity = 0; setTimeout(()=>{ onlineEl.textContent = text; onlineEl.style.transition = 'opacity 300ms'; onlineEl.style.opacity = 1 }, 180); }
 
   /* ----------------- Apply widget data ----------------- */
   function applyData(data, fromCache=false){
     const count = (data && data.presence_count) || 0;
+    const prev = history.length ? history[history.length-1] : 0;
     // update history
     history.push(count); if(history.length > HISTORY_LENGTH) history.shift(); saveHistory();
-    // update sparkline
     drawSparkline(history);
+
+    // if count increases -> sparkle burst + heartbeat
+    if(count > prev){ const delta = count - prev; triggerBurstAroundAvatar(Math.min(28, 6 + delta*3)); ringBeatQuick(); }
 
     showOnlineText(`🟢 Online: ${count} members`);
     updatedAtEl.textContent = new Date().toLocaleString();
-    // ring animation: map count to stroke-dashoffset (0..1) based on a dynamic max
-    const maxGuess = Math.max(50, Math.max(...history), 100); // dynamic max
+    const maxGuess = Math.max(50, Math.max(...history), 100);
     const pct = Math.min(count / maxGuess, 1);
     setRingPercent(pct);
 
-    // invite
     currentInvite = (data && data.instant_invite) || currentInvite || fallbackInvite;
     inviteBtn.onclick = ()=> window.open(currentInvite, '_blank');
   }
 
   /* ----------------- Fetch with cache & backoff ----------------- */
   async function fetchWidget(){
-    // try cache first
     try{ const cache = JSON.parse(localStorage.getItem(cacheKey) || 'null'); if(cache && now() - cache.t < 30*1000){ applyData(cache.data, true); } }catch(e){}
-
     let attempts = 0, backoff = 700;
-    while(attempts < 4){
-      try{
-        const res = await fetch(apiURL, {cache: 'no-store'});
-        if(!res.ok) throw new Error('network');
-        const data = await res.json();
-        localStorage.setItem(cacheKey, JSON.stringify({t: now(), data}));
-        applyData(data);
-        return;
-      }catch(err){ attempts++; await new Promise(r=>setTimeout(r, backoff)); backoff *= 2; }
-    }
-    // failed
+    while(attempts < 4){ try{ const res = await fetch(apiURL, {cache: 'no-store'}); if(!res.ok) throw new Error('network'); const data = await res.json(); localStorage.setItem(cacheKey, JSON.stringify({t: now(), data})); applyData(data); return; }catch(err){ attempts++; await new Promise(r=>setTimeout(r, backoff)); backoff *= 2; } }
     showOnlineText('Unable to load'); updatedAtEl.textContent = new Date().toLocaleString(); inviteBtn.onclick = ()=> window.open(fallbackInvite, '_blank');
   }
 
@@ -242,69 +240,41 @@
 
   /* ----------------- Sparkline drawing ----------------- */
   function drawSparkline(values){
-    const w = sparkCanvas.width = SPARKLINE_WIDTH * devicePixelRatio; const h = sparkCanvas.height = SPARKLINE_HEIGHT * devicePixelRatio; sparkCanvas.style.width = SPARKLINE_WIDTH + 'px'; sparkCanvas.style.height = SPARKLINE_HEIGHT + 'px'; sparkCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    sparkCtx.clearRect(0,0,SPARKLINE_WIDTH,SPARKLINE_HEIGHT);
-    // bounds
-    const max = Math.max(5, ...values);
-    const min = Math.min(...values);
-    const pad = 6;
-    const step = (SPARKLINE_WIDTH - pad*2) / (values.length - 1 || 1);
-    // draw area
+    if(privacyMode) return; const w = sparkCanvas.width = SPARKLINE_WIDTH * devicePixelRatio; const h = sparkCanvas.height = SPARKLINE_HEIGHT * devicePixelRatio; sparkCanvas.style.width = SPARKLINE_WIDTH + 'px'; sparkCanvas.style.height = SPARKLINE_HEIGHT + 'px'; sparkCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); sparkCtx.clearRect(0,0,SPARKLINE_WIDTH,SPARKLINE_HEIGHT);
+    const max = Math.max(5, ...values); const min = Math.min(...values); const pad = 6; const step = (SPARKLINE_WIDTH - pad*2) / (values.length - 1 || 1);
     sparkCtx.beginPath();
-    for(let i=0;i<values.length;i++){
-      const x = pad + i*step; const v = values[i]; const y = SPARKLINE_HEIGHT - pad - ((v - min) / Math.max(1, max - min)) * (SPARKLINE_HEIGHT - pad*2 || 1);
-      if(i===0) sparkCtx.moveTo(x,y); else sparkCtx.lineTo(x,y);
-    }
-    sparkCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#7f00ff';
-    sparkCtx.lineWidth = 2; sparkCtx.stroke();
-    // small gradient fill
-    sparkCtx.lineTo(pad + (values.length-1)*step, SPARKLINE_HEIGHT - pad); sparkCtx.lineTo(pad, SPARKLINE_HEIGHT - pad); sparkCtx.closePath();
-    const g = sparkCtx.createLinearGradient(0,0,0,SPARKLINE_HEIGHT); g.addColorStop(0, (getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#ff00ff') + '33'); g.addColorStop(1, 'transparent'); sparkCtx.fillStyle = g; sparkCtx.fill();
+    for(let i=0;i<values.length;i++){ const x = pad + i*step; const v = values[i]; const y = SPARKLINE_HEIGHT - pad - ((v - min) / Math.max(1, max - min)) * (SPARKLINE_HEIGHT - pad*2 || 1); if(i===0) sparkCtx.moveTo(x,y); else sparkCtx.lineTo(x,y); }
+    sparkCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#7f00ff'; sparkCtx.lineWidth = 2; sparkCtx.stroke(); sparkCtx.lineTo(pad + (values.length-1)*step, SPARKLINE_HEIGHT - pad); sparkCtx.lineTo(pad, SPARKLINE_HEIGHT - pad); sparkCtx.closePath(); const g = sparkCtx.createLinearGradient(0,0,0,SPARKLINE_HEIGHT); g.addColorStop(0, (getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#ff00ff') + '33'); g.addColorStop(1, 'transparent'); sparkCtx.fillStyle = g; sparkCtx.fill(); }
+
+  /* ----------------- SVG Ring control & heartbeat ----------------- */
+  function setRingPercent(pct){ const circle = ringEl; const total = 2 * Math.PI * 46; const dash = total; const offset = dash * (1 - pct); circle.setAttribute('stroke-dasharray', dash); circle.setAttribute('stroke-dashoffset', offset); circle.style.filter = `drop-shadow(0 0 ${4 + pct*10}px ${getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#7f00ff'})`; }
+  function ringBeatQuick(){ ringEl.style.animation = 'ringBeat .6s ease 0s 1'; setTimeout(()=>{ ringEl.style.animation = ''; }, 700); }
+
+  /* ----------------- Burst sparkle effect ----------------- */
+  function triggerBurstAroundAvatar(count=16){ // spawn 'count' particles around avatar area
+    const rect = widgetRoot.getBoundingClientRect(); const cx = rect.width*0.16 + 6; const cy = rect.height*0.18 + 6; // approx near avatar
+    spawnBurst(cx, cy, count);
   }
 
-  /* ----------------- SVG Ring control ----------------- */
-  function setRingPercent(pct){ // pct: 0..1
-    const circle = ringEl; const total = 2 * Math.PI * 46; const dash = total; const offset = dash * (1 - pct);
-    circle.setAttribute('stroke-dasharray', dash);
-    circle.setAttribute('stroke-dashoffset', offset);
-    // gentle pulse based on pct
-    circle.style.filter = `drop-shadow(0 0 ${4 + pct*10}px ${getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#7f00ff'})`;
+  // burst particle system
+  const BURST_PARTICLES = [];
+  function spawnBurst(x,y,n){ const cc = burstCanvas; burstCanvas.width = burstCanvas.offsetWidth * devicePixelRatio; burstCanvas.height = burstCanvas.offsetHeight * devicePixelRatio; burstCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    for(let i=0;i<n;i++){ const a = Math.random()*Math.PI*2; const speed = 1.6 + Math.random()*2.8; BURST_PARTICLES.push({x:x + (Math.random()-0.5)*8, y:y + (Math.random()-0.5)*8, vx:Math.cos(a)*speed, vy:Math.sin(a)*speed, life:60 + Math.random()*30, r:1+Math.random()*2, hue: Math.floor(Math.random()*60) + 260}); }
+    if(!burstAnimating) { burstAnimating=true; requestAnimationFrame(burstLoop); }
   }
+  let burstAnimating = false;
+  function burstLoop(){ const ctx = burstCtx; ctx.clearRect(0,0,burstCanvas.width,burstCanvas.height); for(let i=BURST_PARTICLES.length-1;i>=0;i--){ const p = BURST_PARTICLES[i]; p.x += p.vx; p.y += p.vy; p.vx *= 0.96; p.vy *= 0.96; p.life -= 1; const alpha = Math.max(0, p.life/90); ctx.beginPath(); ctx.fillStyle = `hsla(${p.hue},80%,60%,${alpha})`; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); if(p.life <=0) BURST_PARTICLES.splice(i,1); } if(BURST_PARTICLES.length>0) requestAnimationFrame(burstLoop); else { burstAnimating=false; burstCtx.clearRect(0,0,burstCanvas.width,burstCanvas.height); } }
 
   /* ----------------- Copy invite ----------------- */
   copyBtn.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(currentInvite); copyBtn.textContent = 'Copied!'; setTimeout(()=>copyBtn.textContent='Copy Invite',1600);}catch(e){copyBtn.textContent='Copy failed'} });
 
   /* ----------------- QR modal & temp invite handling ----------------- */
-  qrBtn.addEventListener('click', async ()=>{
-    // try to fetch a temporary invite first (if endpoint configured)
-    const temp = await fetchTemporaryInvite();
-    if(temp && temp.invite){ currentInvite = temp.invite; tempInviteExpiry = temp.expires_at || null; }
-    showQr();
-  });
-
-  function showQr(){ qrModal.classList.add('open'); qrModal.setAttribute('aria-hidden','false'); qrcodeWrap.innerHTML = ''; new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'});
-    updateExpiryHint(); startExpiryTicker(); }
+  qrBtn.addEventListener('click', async ()=>{ const temp = await fetchTemporaryInvite(); if(temp && temp.invite){ currentInvite = temp.invite; tempInviteExpiry = temp.expires_at || null; } showQr(); });
+  function showQr(){ qrModal.classList.add('open'); qrModal.setAttribute('aria-hidden','false'); qrcodeWrap.innerHTML = ''; new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'}); updateExpiryHint(); startExpiryTicker(); }
   document.getElementById('closeQr').addEventListener('click', closeQr); qrModal.addEventListener('click', (ev)=>{ if(ev.target === qrModal) closeQr(); }); function closeQr(){ qrModal.classList.remove('open'); qrModal.setAttribute('aria-hidden','true'); qrcodeWrap.innerHTML = ''; stopExpiryTicker(); }
 
-  // temp invite fetcher (expects server endpoint that returns {invite, expires_in} OR {invite, expires_at})
-  async function fetchTemporaryInvite(){
-    if(!tempInviteEndpoint) return null;
-    try{
-      const res = await fetch(tempInviteEndpoint, {method:'POST',headers:{'Content-Type':'application/json'}});
-      if(!res.ok) throw new Error('no-temp');
-      const j = await res.json();
-      // support either seconds or absolute timestamp
-      let expires_at = null;
-      if(j.expires_in) expires_at = Date.now() + (j.expires_in*1000);
-      if(j.expires_at) expires_at = (typeof j.expires_at === 'number') ? j.expires_at : Date.parse(j.expires_at);
-      inviteExpiryHint.textContent = j.expires_in ? `Expires in ${j.expires_in}s` : 'Temporary invite';
-      return { invite: j.invite || j.url || j.code ? (j.url || `https://discord.gg/${j.code}`) : null, expires_at };
-    }catch(e){ console.warn('temp invite failed', e); return null; }
-  }
-
-  let expiryTicker = null;
-  function startExpiryTicker(){ stopExpiryTicker(); if(!tempInviteExpiry) return; expiryTicker = setInterval(() => { updateExpiryHint(); }, 900); }
-  function stopExpiryTicker(){ if(expiryTicker) clearInterval(expiryTicker); expiryTicker=null; }
+  async function fetchTemporaryInvite(){ if(!tempInviteEndpoint) return null; try{ const res = await fetch(tempInviteEndpoint, {method:'POST',headers:{'Content-Type':'application/json'}}); if(!res.ok) throw new Error('no-temp'); const j = await res.json(); let expires_at = null; if(j.expires_in) expires_at = Date.now() + (j.expires_in*1000); if(j.expires_at) expires_at = (typeof j.expires_at === 'number') ? j.expires_at : Date.parse(j.expires_at); inviteExpiryHint.textContent = j.expires_in ? `Expires in ${j.expires_in}s` : 'Temporary invite'; return { invite: j.invite || j.url || j.code ? (j.url || `https://discord.gg/${j.code}`) : null, expires_at }; }catch(e){ console.warn('temp invite failed', e); return null; } }
+  let expiryTicker = null; function startExpiryTicker(){ stopExpiryTicker(); if(!tempInviteExpiry) return; expiryTicker = setInterval(() => { updateExpiryHint(); }, 900); } function stopExpiryTicker(){ if(expiryTicker) clearInterval(expiryTicker); expiryTicker=null; }
   function updateExpiryHint(){ if(!tempInviteExpiry){ inviteExpiryHint.textContent = 'Scan to join Chillverse'; return; } const s = Math.max(0, Math.round((tempInviteExpiry - Date.now())/1000)); if(s<=0){ inviteExpiryHint.textContent = 'Invite expired — refreshing...'; fetchTemporaryInvite().then(res=>{ if(res && res.invite){ currentInvite = res.invite; tempInviteExpiry = res.expires_at; qrcodeWrap.innerHTML=''; new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'}); } else { inviteExpiryHint.textContent = 'Invite expired'; } }); } else { inviteExpiryHint.textContent = `Expires in ${s}s`; } }
 
   /* ----------------- Theme toggle ----------------- */
@@ -313,66 +283,38 @@
 
   /* ----------------- Starfield + Particle repulse + Parallax ----------------- */
   (function starfield(){
-    const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d');
-    function resize(){ canvas.width = canvas.offsetWidth * devicePixelRatio; canvas.height = canvas.offsetHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+    const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d'); function resize(){ canvas.width = canvas.offsetWidth * devicePixelRatio; canvas.height = canvas.offsetHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); burstCanvas.width = burstCanvas.offsetWidth * devicePixelRatio; burstCanvas.height = burstCanvas.offsetHeight * devicePixelRatio; burstCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
     resize(); window.addEventListener('resize', resize);
-
-    const PARTICLES = 55; const particles = [];
-    function rand(min,max){ return Math.random()*(max-min)+min; }
+    const PARTICLES = 55; const particles = []; function rand(min,max){ return Math.random()*(max-min)+min; }
     for(let i=0;i<PARTICLES;i++){ particles.push({x:rand(0,canvas.offsetWidth), y:rand(0,canvas.offsetHeight), r:rand(0.4,1.8), vx:rand(-0.04,0.04), vy:rand(0.02,0.25), baseVx:0, baseVy:rand(0.02,0.25)}); }
-
-    let mouse = {x:-9999,y:-9999,active:false};
-    stage.addEventListener('mouseenter', ()=>{ mouse.active=true }); stage.addEventListener('mouseleave', ()=>{ mouse.active=false; mouse.x=-9999; mouse.y=-9999; });
-    stage.addEventListener('mousemove', (e)=>{ const r = stage.getBoundingClientRect(); mouse.x = (e.clientX - r.left); mouse.y = (e.clientY - r.top); });
-
-    // parallax layers transform based on pointer
+    let mouse = {x:-9999,y:-9999,active:false}; stage.addEventListener('mouseenter', ()=>{ mouse.active=true }); stage.addEventListener('mouseleave', ()=>{ mouse.active=false; mouse.x=-9999; mouse.y=-9999; }); stage.addEventListener('mousemove', (e)=>{ const r = stage.getBoundingClientRect(); mouse.x = (e.clientX - r.left); mouse.y = (e.clientY - r.top); });
     const layers = Array.from(document.querySelectorAll('.layer'));
     function parallaxMove(){ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; const r = stage.getBoundingClientRect(); const cx = r.width/2; const cy = r.height/2; let mx = (mouse.x === -9999) ? cx : mouse.x; let my = (mouse.y === -9999) ? cy : mouse.y; const rx = (mx - cx)/cx; const ry = (my - cy)/cy; layers.forEach((el,i)=>{ const depth = (i+1)/8; el.style.transform = `translate3d(${ -rx * depth * 8 }px, ${ -ry * depth * 8 }px, 0) scale(${1 - i*0.002})`; }); }
-
-    let last=0; function draw(t){ if(t - last < 28){ requestAnimationFrame(draw); return; } last = t; ctx.clearRect(0,0,canvas.width,canvas.height);
-      // subtle vignette
-      ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,canvas.offsetWidth,canvas.offsetHeight);
-      for(const p of particles){
-        // apply gentle base motion
-        p.x += p.vx; p.y += p.vy;
-        // mouse repulse
-        if(mouse.active){ const dx = p.x - mouse.x; const dy = p.y - mouse.y; const dist2 = dx*dx + dy*dy; const R = 90; if(dist2 < R*R){ const f = (1 - (Math.sqrt(dist2)/R)); p.vx += (dx/dist2) * f * 0.6; p.vy += (dy/dist2) * f * 0.6; } }
-        // dampening
-        p.vx *= 0.98; p.vy = p.vy*0.98 + p.baseVy*0.02;
-        // wrap
-        if(p.y > canvas.offsetHeight + 6){ p.y = -6; p.x = Math.random()*canvas.offsetWidth; }
-        if(p.x < -10) p.x = canvas.offsetWidth+10; if(p.x > canvas.offsetWidth+10) p.x = -10;
-        // draw
-        const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*6);
-        g.addColorStop(0, `rgba(255,255,255,${0.85 * (p.r/1.8)})`); g.addColorStop(0.6, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }
-      parallaxMove(); requestAnimationFrame(draw); }
+    let last=0; function draw(t){ if(t - last < 28){ requestAnimationFrame(draw); return; } last = t; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,canvas.offsetWidth,canvas.offsetHeight); for(const p of particles){ p.x += p.vx; p.y += p.vy; if(mouse.active){ const dx = p.x - mouse.x; const dy = p.y - mouse.y; const dist2 = dx*dx + dy*dy; const R = 90; if(dist2 < R*R){ const f = (1 - (Math.sqrt(dist2)/R)); p.vx += (dx/dist2) * f * 0.6; p.vy += (dy/dist2) * f * 0.6; } } p.vx *= 0.98; p.vy = p.vy*0.98 + p.baseVy*0.02; if(p.y > canvas.offsetHeight + 6){ p.y = -6; p.x = Math.random()*canvas.offsetWidth; } if(p.x < -10) p.x = canvas.offsetWidth+10; if(p.x > canvas.offsetWidth+10) p.x = -10; const g = ctx.createRadialGradient(p.x,p.y,p.r,p.x,p.y,p.r*6); g.addColorStop(0, `rgba(255,255,255,${0.85 * (p.r/1.8)})`); g.addColorStop(0.6, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } parallaxMove(); requestAnimationFrame(draw); }
     draw(0);
   })();
 
   /* ----------------- Micro-parallax on widget (for mouse move) ----------------- */
-  (function widgetParallax(){
-    const root = document.getElementById('widgetRoot');
-    stage.addEventListener('mousemove', (e)=>{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; const r = root.getBoundingClientRect(); const cx = r.left + r.width/2; const cy = r.top + r.height/2; const rx = (e.clientX - cx)/r.width; const ry = (e.clientY - cy)/r.height; root.style.transform = `translate3d(${rx*6}px, ${ry*6}px, 0)`; setTimeout(()=>{ root.style.transform = `translate3d(0,0,0)`; }, 180);
-    });
-    stage.addEventListener('mouseleave', ()=>{ root.style.transform = ''; });
-  })();
+  (function widgetParallax(){ const root = document.getElementById('widgetRoot'); stage.addEventListener('mousemove', (e)=>{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; const r = root.getBoundingClientRect(); const cx = r.left + r.width/2; const cy = r.top + r.height/2; const rx = (e.clientX - cx)/r.width; const ry = (e.clientY - cy)/r.height; root.style.transform = `translate3d(${rx*6}px, ${ry*6}px, 0)`; setTimeout(()=>{ root.style.transform = `translate3d(0,0,0)`; }, 180); }); stage.addEventListener('mouseleave', ()=>{ root.style.transform = ''; }); })();
+
+  /* ----------------- Privacy toggle ----------------- */
+  const privacyBtn = document.getElementById('privacyBtn');
+  function setPrivacy(v){ privacyMode = !!v; savePrivacy(privacyMode); if(privacyMode){ document.documentElement.classList.add('privacy'); privacyBtn.setAttribute('aria-pressed','true'); privacyBtn.textContent = 'Private'; } else { document.documentElement.classList.remove('privacy'); privacyBtn.setAttribute('aria-pressed','false'); privacyBtn.textContent = 'Privacy'; drawSparkline(history); } }
+  privacyBtn.addEventListener('click', ()=>{ setPrivacy(!privacyMode); if(privacyMode){ // hide details
+      showOnlineText('Hidden'); } else { fetchWidget(); } });
 
   /* ----------------- Accessibility & misc ----------------- */
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') { if(qrModal.classList.contains('open')) closeQr(); } });
 
   /* ----------------- Temp invite background refresh (auto) ----------------- */
-  // attempt to refresh a temp invite every 60s if temp endpoint available
-  setInterval(async ()=>{
-    if(!tempInviteEndpoint) return; try{ const temp = await fetchTemporaryInvite(); if(temp && temp.invite){ currentInvite = temp.invite; tempInviteExpiry = temp.expires_at; } }catch(e){} }, 60_000);
+  setInterval(async ()=>{ if(!tempInviteEndpoint) return; try{ const temp = await fetchTemporaryInvite(); if(temp && temp.invite){ currentInvite = temp.invite; tempInviteExpiry = temp.expires_at; } }catch(e){} }, 60_000);
 
-  // initial setup for ring and sparkline
+  /* ----------------- Init visuals ----------------- */
   setRingPercent(0); drawSparkline(history);
-
-  // copy invite initial fallback
   inviteBtn.addEventListener('click', ()=> window.open(currentInvite, '_blank'));
 
   // expose for debugging
-  window.__chillverse = { fetchWidget, fetchTemporaryInvite, history };
+  window.__chillverse = { fetchWidget, fetchTemporaryInvite, history, setPrivacy };
   </script>
 </body>
 </html>
