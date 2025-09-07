@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>✨═━☆ Chillverse ☆━═✨ — Widget (Enhanced)</title>
+<title>✨═━☆ Chillverse ☆━═✨</title>
 <style>
   :root{
     --bg:#07070a;
@@ -15,54 +15,36 @@
     --glass: rgba(255,255,255,0.04);
     --width:360px;
   }
-  /* Calm theme overrides */
-  :root[data-theme='calm']{
-    --accent:#00b3cc;
-    --accent-2:#5de0a3;
-    --highlight:#ffd86b;
-    --card-bg: rgba(14,18,20,0.58);
-    --bg: linear-gradient(180deg,#071018 0%,#000814 100%);
-  }
-  /* Neon theme overrides */
-  :root[data-theme='neon']{
-    --accent:#ff0080;
-    --accent-2:#00ffd5;
-    --highlight:#ffd400;
-    --card-bg: rgba(12,6,18,0.65);
-    --bg: linear-gradient(180deg,#020005 0%,#0b001a 100%);
-  }
+  :root[data-theme='calm']{ --accent:#00b3cc; --accent-2:#5de0a3; --highlight:#ffd86b; --card-bg: rgba(14,18,20,0.58); --bg: linear-gradient(180deg,#071018 0%,#000814 100%);} 
+  :root[data-theme='neon']{ --accent:#ff0080; --accent-2:#00ffd5; --highlight:#ffd400; --card-bg: rgba(12,6,18,0.65); --bg: linear-gradient(180deg,#020005 0%,#0b001a 100%);} 
 
   html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;}
-  body{
-    display:flex;align-items:center;justify-content:center;
-    background: var(--bg);
-    color:#fff;padding:28px;
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
+  body{display:flex;align-items:center;justify-content:center;background: var(--bg);color:#fff;padding:28px;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
 
-  /* starfield canvas sits behind the widget */
-  .stage{position:relative;width:var(--width);max-width:92vw}
-  canvas#starfield{position:absolute;inset:0;border-radius:18px;z-index:0;pointer-events:none}
+  /* stage holds parallax layers and the widget */
+  .stage{position:relative;width:var(--width);max-width:92vw;height:auto;padding:10px}
 
-  .widget{
-    position:relative;z-index:2;
-    width:100%;max-width:var(--width);
-    border-radius:18px;padding:20px 20px 18px 20px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.2));
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px var(--accent)22;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,0.03);
-  }
+  /* parallax layers (subtle glass cards) */
+  .layer{position:absolute;inset:6px;border-radius:18px;pointer-events:none;z-index:0;opacity:0.55;transform:translate3d(0,0,0)}
+  .layer.l1{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);box-shadow:0 12px 40px rgba(0,0,0,0.45);filter:blur(6px)}
+  .layer.l2{inset:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);transform-origin:center}
+  .layer.l3{inset:18px;background:linear-gradient(180deg,rgba(255,255,255,0.008),transparent)}
 
-  /* animated gradient border using pseudo-element */
+  canvas#starfield{position:absolute;inset:6px;border-radius:16px;z-index:0;pointer-events:none}
+
+  .widget{position:relative;z-index:2;width:100%;max-width:var(--width);border-radius:18px;padding:18px 18px 16px 18px;background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.18));box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px var(--accent)22;backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+
   .widget::before{content:'';position:absolute;inset:-2px;border-radius:20px;padding:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--highlight),var(--accent));background-size:300% 300%;animation:slide 12s linear infinite;mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:1}
   @keyframes slide{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
   .top{display:flex;gap:12px;align-items:center;margin-bottom:12px;position:relative;z-index:2}
-  .pfp{width:86px;height:86px;border-radius:50%;border:3px solid rgba(255,221,0,0.9);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent)}
+
+  /* avatar with SVG ring */
+  .pfp-wrap{width:90px;height:90px;border-radius:50%;position:relative;flex-shrink:0}
+  .pfp{width:90px;height:90px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);border:3px solid rgba(255,221,0,0.9)}
   .pfp img{width:100%;height:100%;object-fit:cover;display:block}
+  .pfp-svg{position:absolute;left:0;top:0;width:90px;height:90px;pointer-events:none}
+
   .title{flex:1;text-align:left}
   .title h1{margin:0;font-size:20px;letter-spacing:0.4px;color:var(--highlight);text-shadow:0 0 8px var(--accent)}
   .title p{margin:6px 0 0 0;font-size:13px;color:var(--muted);line-height:1.3}
@@ -72,52 +54,61 @@
   .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--accent),var(--accent-2));box-shadow:0 0 8px var(--accent);}
   #online-count{font-weight:700;font-size:16px;color:#fff}
 
+  /* sparkline */
+  .sparkline{width:120px;height:36px;border-radius:6px;background:transparent}
+
   .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
   .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:9px 12px;border-radius:10px;color:#fff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,0.4);cursor:pointer;border:none}
   .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);font-weight:600}
   .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
   .small{font-size:13px;padding:8px 10px;border-radius:9px}
 
-  /* skeleton */
   .skeleton{height:16px;background:linear-gradient(90deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06),rgba(255,255,255,0.03));background-size:200% 100%;border-radius:8px;animation:shimmer 1.6s linear infinite}
   @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-  /* theme toggles */
   .theme-picker{display:flex;gap:8px}
-  .swatch{width:10px;height:10px;border-radius:3px;box-shadow:0 0 8px rgba(0,0,0,0.4);}
-  .swatch[data-theme='dark']{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
-  .swatch[data-theme='calm']{background:linear-gradient(90deg,#00b3cc,#5de0a3)}
-  .swatch[data-theme='neon']{background:linear-gradient(90deg,#ff0080,#00ffd5)}
-
-  /* QR modal */
+  .hint{font-size:13px;color:var(--muted)}
   .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:9999}
   .modal.open{display:flex}
   .modal .card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.5));padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6);display:flex;gap:14px;align-items:center}
 
-  .hint{font-size:13px;color:var(--muted)}
+  #updatedAt{color:var(--muted);font-size:12px}
 
-  /* accessibility */
-  #online-count[aria-live]{min-width:140px}
-
-  @media (prefers-reduced-motion: reduce){
-    .widget::before,canvas#starfield,.pfp{animation:none!important;transition:none!important}
-    .skeleton{animation:none}
-  }
-
-  @media (max-width:420px){:root{--width:92vw}.top{flex-direction:row}.pfp{width:72px;height:72px}.title h1{font-size:18px}}
+  @media (prefers-reduced-motion: reduce){.widget::before,canvas#starfield,.pfp-svg{animation:none!important;transition:none!important}.skeleton{animation:none}}
+  @media (max-width:420px){:root{--width:92vw}.top{flex-direction:row}.pfp{width:72px;height:72px}.pfp-svg{width:72px;height:72px}.title h1{font-size:18px}}
 </style>
 </head>
 <body>
   <div class="stage" role="region" aria-label="Chillverse server widget">
+    <!-- parallax glass layers -->
+    <div class="layer l1"></div>
+    <div class="layer l2"></div>
+    <div class="layer l3"></div>
+
     <canvas id="starfield" width="720" height="480" aria-hidden="true"></canvas>
 
-    <div class="widget" role="article">
+    <div class="widget" role="article" id="widgetRoot">
       <div class="top">
-        <div class="pfp" aria-hidden="true"><img src="pfp.jfif" alt="Chillverse" /></div>
+        <div class="pfp-wrap" aria-hidden="true">
+          <div class="pfp"><img src="pfp.jfif" alt="Chillverse" /></div>
+          <!-- SVG ring: stroke length will be adjusted via JS based on online percent -->
+          <svg class="pfp-svg" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="0%">
+                <stop offset="0%" stop-color="var(--accent)" />
+                <stop offset="100%" stop-color="var(--accent-2)" />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="6" />
+            <circle id="ring" cx="50" cy="50" r="46" fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round" stroke-dasharray="290" stroke-dashoffset="290" transform="rotate(-90 50 50)" />
+          </svg>
+        </div>
+
         <div class="title">
           <h1>✨═━☆ Chillverse ☆━═✨</h1>
           <p>An ambient space for vibes, chats & friendly hangs — relax and say hi. 🌌</p>
         </div>
+
         <div class="actions" aria-hidden="true">
           <div class="theme-picker" title="Theme">
             <button class="btn ghost small" id="themeBtn" aria-label="Change theme">Theme</button>
@@ -133,6 +124,8 @@
             <div id="online-count" aria-live="polite"><div class="skeleton" style="width:120px"></div></div>
           </div>
         </div>
+
+        <canvas class="sparkline" id="sparkline" width="160" height="46" title="Presence sparkline" aria-hidden="true"></canvas>
 
         <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
           <button id="inviteBtn" class="btn" title="Join Chillverse">Join</button>
@@ -154,7 +147,7 @@
     <div class="card">
       <div id="qrcode"></div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="hint">Scan to join Chillverse</div>
+        <div class="hint" id="inviteExpiryHint">Scan to join Chillverse</div>
         <button id="closeQr" class="btn small">Close</button>
       </div>
     </div>
@@ -164,13 +157,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script>
-  // ----- config -----
+  /* ----------------- Config ----------------- */
   const serverID = '1413927989481308192';
   const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
-  const fallbackInvite = 'https://discord.gg/rh6tYYKF5g';
-  const cacheKey = 'chillverse.widget.cache';
+  const fallbackInvite = 'https://discord.gg/YOUR_INVITE_HERE';
 
-  // ----- DOM -----
+  // Optional server endpoint that creates a time-limited invite. If you want auto-expiring invites,
+  // implement a server endpoint that returns: { invite: 'https://discord.gg/abc', expires_in: 300 }
+  const tempInviteEndpoint = '/api/generate-invite'; // <--- replace with your real endpoint or leave as-is for fallback
+
+  const cacheKey = 'chillverse.widget.cache.v2';
+  const historyKey = 'chillverse.widget.history';
+  const HISTORY_LENGTH = 30;
+  const SPARKLINE_WIDTH = 160, SPARKLINE_HEIGHT = 46;
+
+  /* ----------------- DOM ----------------- */
   const onlineEl = document.getElementById('online-count');
   const updatedAtEl = document.getElementById('updatedAt');
   const inviteBtn = document.getElementById('inviteBtn');
@@ -178,145 +179,200 @@
   const copyBtn = document.getElementById('copyBtn');
   const qrModal = document.getElementById('qrModal');
   const qrcodeWrap = document.getElementById('qrcode');
+  const inviteExpiryHint = document.getElementById('inviteExpiryHint');
+  const ringEl = document.getElementById('ring');
+  const sparkCanvas = document.getElementById('sparkline');
+  const sparkCtx = sparkCanvas.getContext('2d');
+  const stage = document.querySelector('.stage');
+  const widgetRoot = document.getElementById('widgetRoot');
 
-  // keep current invite
+  /* ----------------- State ----------------- */
   let currentInvite = fallbackInvite;
+  let tempInviteExpiry = null; // timestamp
+  let history = loadHistory();
 
-  // small helper to set text with fade
-  function showOnlineText(text){
-    // remove skeleton if present
-    if(onlineEl.querySelector('.skeleton')){
-      onlineEl.innerHTML = '';
-    }
-    const prev = onlineEl.textContent;
-    if(prev === text) return; // no change
-    onlineEl.style.opacity = 0;
-    setTimeout(()=>{ onlineEl.textContent = text; onlineEl.style.transition = 'opacity 300ms'; onlineEl.style.opacity = 1 }, 180);
+  /* ----------------- Helpers ----------------- */
+  function now(){ return Date.now(); }
+  function loadHistory(){ try{ const j = localStorage.getItem(historyKey); if(j) return JSON.parse(j).slice(-HISTORY_LENGTH); }catch(e){}; return Array(HISTORY_LENGTH).fill(0); }
+  function saveHistory(){ try{ localStorage.setItem(historyKey, JSON.stringify(history)); }catch(e){} }
+
+  function showOnlineText(text){ if(onlineEl.querySelector('.skeleton')){ onlineEl.innerHTML = ''; } const prev = onlineEl.textContent; if(prev === text) return; onlineEl.style.opacity = 0; setTimeout(()=>{ onlineEl.textContent = text; onlineEl.style.transition = 'opacity 300ms'; onlineEl.style.opacity = 1 }, 180); }
+
+  /* ----------------- Apply widget data ----------------- */
+  function applyData(data, fromCache=false){
+    const count = (data && data.presence_count) || 0;
+    // update history
+    history.push(count); if(history.length > HISTORY_LENGTH) history.shift(); saveHistory();
+    // update sparkline
+    drawSparkline(history);
+
+    showOnlineText(`🟢 Online: ${count} members`);
+    updatedAtEl.textContent = new Date().toLocaleString();
+    // ring animation: map count to stroke-dashoffset (0..1) based on a dynamic max
+    const maxGuess = Math.max(50, Math.max(...history), 100); // dynamic max
+    const pct = Math.min(count / maxGuess, 1);
+    setRingPercent(pct);
+
+    // invite
+    currentInvite = (data && data.instant_invite) || currentInvite || fallbackInvite;
+    inviteBtn.onclick = ()=> window.open(currentInvite, '_blank');
   }
 
-  // fetch with caching and exponential backoff
+  /* ----------------- Fetch with cache & backoff ----------------- */
   async function fetchWidget(){
-    // check cache
-    try{
-      const cache = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if(cache && Date.now() - cache.t < 30*1000){
-        applyData(cache.data, true);
-        return;
-      }
-    }catch(e){/* ignore */}
+    // try cache first
+    try{ const cache = JSON.parse(localStorage.getItem(cacheKey) || 'null'); if(cache && now() - cache.t < 30*1000){ applyData(cache.data, true); } }catch(e){}
 
-    let attempts = 0;
-    let backoff = 700;
+    let attempts = 0, backoff = 700;
     while(attempts < 4){
       try{
         const res = await fetch(apiURL, {cache: 'no-store'});
         if(!res.ok) throw new Error('network');
         const data = await res.json();
-        localStorage.setItem(cacheKey, JSON.stringify({t:Date.now(), data}));
+        localStorage.setItem(cacheKey, JSON.stringify({t: now(), data}));
         applyData(data);
         return;
-      }catch(err){
-        attempts++;
-        await new Promise(r=>setTimeout(r, backoff));
-        backoff *= 2;
-      }
+      }catch(err){ attempts++; await new Promise(r=>setTimeout(r, backoff)); backoff *= 2; }
     }
-    // failed: show fallback
-    showOnlineText('Unable to load');
-    updatedAtEl.textContent = new Date().toLocaleString();
-    inviteBtn.onclick = ()=> window.open(fallbackInvite, '_blank');
+    // failed
+    showOnlineText('Unable to load'); updatedAtEl.textContent = new Date().toLocaleString(); inviteBtn.onclick = ()=> window.open(fallbackInvite, '_blank');
   }
 
-  function applyData(data, fromCache=false){
-    const count = (data && data.presence_count) || 0;
-    showOnlineText(`🟢 Online: ${count} members`);
-    updatedAtEl.textContent = new Date().toLocaleString();
-    currentInvite = (data && data.instant_invite) || fallbackInvite;
-    inviteBtn.onclick = ()=> window.open(currentInvite, '_blank');
+  fetchWidget(); setInterval(fetchWidget, 15_000);
+
+  /* ----------------- Sparkline drawing ----------------- */
+  function drawSparkline(values){
+    const w = sparkCanvas.width = SPARKLINE_WIDTH * devicePixelRatio; const h = sparkCanvas.height = SPARKLINE_HEIGHT * devicePixelRatio; sparkCanvas.style.width = SPARKLINE_WIDTH + 'px'; sparkCanvas.style.height = SPARKLINE_HEIGHT + 'px'; sparkCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    sparkCtx.clearRect(0,0,SPARKLINE_WIDTH,SPARKLINE_HEIGHT);
+    // bounds
+    const max = Math.max(5, ...values);
+    const min = Math.min(...values);
+    const pad = 6;
+    const step = (SPARKLINE_WIDTH - pad*2) / (values.length - 1 || 1);
+    // draw area
+    sparkCtx.beginPath();
+    for(let i=0;i<values.length;i++){
+      const x = pad + i*step; const v = values[i]; const y = SPARKLINE_HEIGHT - pad - ((v - min) / Math.max(1, max - min)) * (SPARKLINE_HEIGHT - pad*2 || 1);
+      if(i===0) sparkCtx.moveTo(x,y); else sparkCtx.lineTo(x,y);
+    }
+    sparkCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#7f00ff';
+    sparkCtx.lineWidth = 2; sparkCtx.stroke();
+    // small gradient fill
+    sparkCtx.lineTo(pad + (values.length-1)*step, SPARKLINE_HEIGHT - pad); sparkCtx.lineTo(pad, SPARKLINE_HEIGHT - pad); sparkCtx.closePath();
+    const g = sparkCtx.createLinearGradient(0,0,0,SPARKLINE_HEIGHT); g.addColorStop(0, (getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#ff00ff') + '33'); g.addColorStop(1, 'transparent'); sparkCtx.fillStyle = g; sparkCtx.fill();
   }
 
-  // initial fetch
-  fetchWidget();
-  // poll but rely on cache to avoid excessive calls
-  setInterval(fetchWidget, 15_000);
+  /* ----------------- SVG Ring control ----------------- */
+  function setRingPercent(pct){ // pct: 0..1
+    const circle = ringEl; const total = 2 * Math.PI * 46; const dash = total; const offset = dash * (1 - pct);
+    circle.setAttribute('stroke-dasharray', dash);
+    circle.setAttribute('stroke-dashoffset', offset);
+    // gentle pulse based on pct
+    circle.style.filter = `drop-shadow(0 0 ${4 + pct*10}px ${getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#7f00ff'})`;
+  }
 
-  // copy invite
-  copyBtn.addEventListener('click', async ()=>{
-    try{ await navigator.clipboard.writeText(currentInvite); copyBtn.textContent = 'Copied!'; setTimeout(()=>copyBtn.textContent='Copy Invite',1600);
-    }catch(e){copyBtn.textContent='Copy failed'}
+  /* ----------------- Copy invite ----------------- */
+  copyBtn.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(currentInvite); copyBtn.textContent = 'Copied!'; setTimeout(()=>copyBtn.textContent='Copy Invite',1600);}catch(e){copyBtn.textContent='Copy failed'} });
+
+  /* ----------------- QR modal & temp invite handling ----------------- */
+  qrBtn.addEventListener('click', async ()=>{
+    // try to fetch a temporary invite first (if endpoint configured)
+    const temp = await fetchTemporaryInvite();
+    if(temp && temp.invite){ currentInvite = temp.invite; tempInviteExpiry = temp.expires_at || null; }
+    showQr();
   });
 
-  // QR modal
-  qrBtn.addEventListener('click', ()=>{
-    qrModal.classList.add('open'); qrModal.setAttribute('aria-hidden','false');
-    qrcodeWrap.innerHTML = '';
-    new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'});
-  });
-  document.getElementById('closeQr').addEventListener('click', closeQr);
-  qrModal.addEventListener('click', (ev)=>{ if(ev.target === qrModal) closeQr(); });
-  function closeQr(){ qrModal.classList.remove('open'); qrModal.setAttribute('aria-hidden','true'); qrcodeWrap.innerHTML = ''; }
+  function showQr(){ qrModal.classList.add('open'); qrModal.setAttribute('aria-hidden','false'); qrcodeWrap.innerHTML = ''; new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'});
+    updateExpiryHint(); startExpiryTicker(); }
+  document.getElementById('closeQr').addEventListener('click', closeQr); qrModal.addEventListener('click', (ev)=>{ if(ev.target === qrModal) closeQr(); }); function closeQr(){ qrModal.classList.remove('open'); qrModal.setAttribute('aria-hidden','true'); qrcodeWrap.innerHTML = ''; stopExpiryTicker(); }
 
-  // Theme toggle: cycle between dark, calm, neon
-  const themes = ['dark','calm','neon'];
-  let idx = 0;
-  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.documentElement.style.setProperty('--theme',t); }
-  document.getElementById('themeBtn').addEventListener('click', ()=>{ idx = (idx+1)%themes.length; setTheme(themes[idx]); localStorage.setItem('chill.theme',themes[idx]); });
-  // hydrate
-  try{ const saved = localStorage.getItem('chill.theme'); if(saved) { idx = themes.indexOf(saved); if(idx<0) idx=0; setTheme(themes[idx]); }}catch(e){}
+  // temp invite fetcher (expects server endpoint that returns {invite, expires_in} OR {invite, expires_at})
+  async function fetchTemporaryInvite(){
+    if(!tempInviteEndpoint) return null;
+    try{
+      const res = await fetch(tempInviteEndpoint, {method:'POST',headers:{'Content-Type':'application/json'}});
+      if(!res.ok) throw new Error('no-temp');
+      const j = await res.json();
+      // support either seconds or absolute timestamp
+      let expires_at = null;
+      if(j.expires_in) expires_at = Date.now() + (j.expires_in*1000);
+      if(j.expires_at) expires_at = (typeof j.expires_at === 'number') ? j.expires_at : Date.parse(j.expires_at);
+      inviteExpiryHint.textContent = j.expires_in ? `Expires in ${j.expires_in}s` : 'Temporary invite';
+      return { invite: j.invite || j.url || j.code ? (j.url || `https://discord.gg/${j.code}`) : null, expires_at };
+    }catch(e){ console.warn('temp invite failed', e); return null; }
+  }
 
-  // --- starfield (subtle, low cpu) ---
+  let expiryTicker = null;
+  function startExpiryTicker(){ stopExpiryTicker(); if(!tempInviteExpiry) return; expiryTicker = setInterval(() => { updateExpiryHint(); }, 900); }
+  function stopExpiryTicker(){ if(expiryTicker) clearInterval(expiryTicker); expiryTicker=null; }
+  function updateExpiryHint(){ if(!tempInviteExpiry){ inviteExpiryHint.textContent = 'Scan to join Chillverse'; return; } const s = Math.max(0, Math.round((tempInviteExpiry - Date.now())/1000)); if(s<=0){ inviteExpiryHint.textContent = 'Invite expired — refreshing...'; fetchTemporaryInvite().then(res=>{ if(res && res.invite){ currentInvite = res.invite; tempInviteExpiry = res.expires_at; qrcodeWrap.innerHTML=''; new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'}); } else { inviteExpiryHint.textContent = 'Invite expired'; } }); } else { inviteExpiryHint.textContent = `Expires in ${s}s`; } }
+
+  /* ----------------- Theme toggle ----------------- */
+  const themes = ['dark','calm','neon']; let idx = 0; function setTheme(t){ document.documentElement.setAttribute('data-theme', t); localStorage.setItem('chill.theme',t); }
+  const themeBtn = document.getElementById('themeBtn'); themeBtn.addEventListener('click', ()=>{ idx = (idx+1)%themes.length; setTheme(themes[idx]); }); try{ const saved = localStorage.getItem('chill.theme'); if(saved){ idx = themes.indexOf(saved); if(idx<0) idx=0; setTheme(themes[idx]); }}catch(e){}
+
+  /* ----------------- Starfield + Particle repulse + Parallax ----------------- */
   (function starfield(){
-    const canvas = document.getElementById('starfield');
-    const ctx = canvas.getContext('2d');
-    let w = canvas.width = canvas.offsetWidth * devicePixelRatio;
-    let h = canvas.height = canvas.offsetHeight * devicePixelRatio;
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+    const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d');
+    function resize(){ canvas.width = canvas.offsetWidth * devicePixelRatio; canvas.height = canvas.offsetHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+    resize(); window.addEventListener('resize', resize);
 
-    const PARTICLES = 45; // very subtle
-    const stars = [];
-    function rand(min,max){return Math.random()*(max-min)+min}
-    for(let i=0;i<PARTICLES;i++){
-      stars.push({x:rand(0,canvas.offsetWidth), y:rand(0,canvas.offsetHeight), r:rand(0.3,1.8), vx:rand(-0.02,0.02), vy:rand(0.05,0.35)})
-    }
+    const PARTICLES = 55; const particles = [];
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    for(let i=0;i<PARTICLES;i++){ particles.push({x:rand(0,canvas.offsetWidth), y:rand(0,canvas.offsetHeight), r:rand(0.4,1.8), vx:rand(-0.04,0.04), vy:rand(0.02,0.25), baseVx:0, baseVy:rand(0.02,0.25)}); }
 
-    function resize(){
-      canvas.width = canvas.offsetWidth * devicePixelRatio;
-      canvas.height = canvas.offsetHeight * devicePixelRatio;
-      ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    }
-    window.addEventListener('resize', ()=>{ resize(); });
+    let mouse = {x:-9999,y:-9999,active:false};
+    stage.addEventListener('mouseenter', ()=>{ mouse.active=true }); stage.addEventListener('mouseleave', ()=>{ mouse.active=false; mouse.x=-9999; mouse.y=-9999; });
+    stage.addEventListener('mousemove', (e)=>{ const r = stage.getBoundingClientRect(); mouse.x = (e.clientX - r.left); mouse.y = (e.clientY - r.top); });
 
-    let last=0;
-    function draw(t){
-      // throttle to ~30fps
-      if(t - last < 32){ requestAnimationFrame(draw); return; }
-      last = t;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      // gentle vignette
-      ctx.fillStyle = 'rgba(0,0,0,0.12)';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
+    // parallax layers transform based on pointer
+    const layers = Array.from(document.querySelectorAll('.layer'));
+    function parallaxMove(){ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; const r = stage.getBoundingClientRect(); const cx = r.width/2; const cy = r.height/2; let mx = (mouse.x === -9999) ? cx : mouse.x; let my = (mouse.y === -9999) ? cy : mouse.y; const rx = (mx - cx)/cx; const ry = (my - cy)/cy; layers.forEach((el,i)=>{ const depth = (i+1)/8; el.style.transform = `translate3d(${ -rx * depth * 8 }px, ${ -ry * depth * 8 }px, 0) scale(${1 - i*0.002})`; }); }
 
-      for(const s of stars){
-        s.x += s.vx; s.y += s.vy;
-        if(s.y > canvas.offsetHeight + 6) { s.y = -6; s.x = Math.random()*canvas.offsetWidth; }
-        if(s.x < -10) s.x = canvas.offsetWidth+10; if(s.x > canvas.offsetWidth+10) s.x = -10;
-        const g = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*6);
-        g.addColorStop(0, "rgba(255,255,255,"+ (0.85 * (s.r/1.8)) +")");
-        g.addColorStop(0.6, "rgba(255,255,255,0.12)");
-        g.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
-      }
-      requestAnimationFrame(draw);
-    }
+    let last=0; function draw(t){ if(t - last < 28){ requestAnimationFrame(draw); return; } last = t; ctx.clearRect(0,0,canvas.width,canvas.height);
+      // subtle vignette
+      ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,canvas.offsetWidth,canvas.offsetHeight);
+      for(const p of particles){
+        // apply gentle base motion
+        p.x += p.vx; p.y += p.vy;
+        // mouse repulse
+        if(mouse.active){ const dx = p.x - mouse.x; const dy = p.y - mouse.y; const dist2 = dx*dx + dy*dy; const R = 90; if(dist2 < R*R){ const f = (1 - (Math.sqrt(dist2)/R)); p.vx += (dx/dist2) * f * 0.6; p.vy += (dy/dist2) * f * 0.6; } }
+        // dampening
+        p.vx *= 0.98; p.vy = p.vy*0.98 + p.baseVy*0.02;
+        // wrap
+        if(p.y > canvas.offsetHeight + 6){ p.y = -6; p.x = Math.random()*canvas.offsetWidth; }
+        if(p.x < -10) p.x = canvas.offsetWidth+10; if(p.x > canvas.offsetWidth+10) p.x = -10;
+        // draw
+        const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*6);
+        g.addColorStop(0, `rgba(255,255,255,${0.85 * (p.r/1.8)})`); g.addColorStop(0.6, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); }
+      parallaxMove(); requestAnimationFrame(draw); }
     draw(0);
   })();
 
-  // Respect prefers-reduced-motion: stop the starfield animations if user prefers reduced motion
-  const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if(media.matches){ const c = document.getElementById('starfield'); if(c && c.parentNode) c.parentNode.removeChild(c); }
+  /* ----------------- Micro-parallax on widget (for mouse move) ----------------- */
+  (function widgetParallax(){
+    const root = document.getElementById('widgetRoot');
+    stage.addEventListener('mousemove', (e)=>{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; const r = root.getBoundingClientRect(); const cx = r.left + r.width/2; const cy = r.top + r.height/2; const rx = (e.clientX - cx)/r.width; const ry = (e.clientY - cy)/r.height; root.style.transform = `translate3d(${rx*6}px, ${ry*6}px, 0)`; setTimeout(()=>{ root.style.transform = `translate3d(0,0,0)`; }, 180);
+    });
+    stage.addEventListener('mouseleave', ()=>{ root.style.transform = ''; });
+  })();
 
-  // Ensure widget is keyboard accessible
-  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeQr(); });
+  /* ----------------- Accessibility & misc ----------------- */
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') { if(qrModal.classList.contains('open')) closeQr(); } });
+
+  /* ----------------- Temp invite background refresh (auto) ----------------- */
+  // attempt to refresh a temp invite every 60s if temp endpoint available
+  setInterval(async ()=>{
+    if(!tempInviteEndpoint) return; try{ const temp = await fetchTemporaryInvite(); if(temp && temp.invite){ currentInvite = temp.invite; tempInviteExpiry = temp.expires_at; } }catch(e){} }, 60_000);
+
+  // initial setup for ring and sparkline
+  setRingPercent(0); drawSparkline(history);
+
+  // copy invite initial fallback
+  inviteBtn.addEventListener('click', ()=> window.open(currentInvite, '_blank'));
+
+  // expose for debugging
+  window.__chillverse = { fetchWidget, fetchTemporaryInvite, history };
   </script>
 </body>
 </html>
