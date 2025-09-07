@@ -1,187 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>✨═━☆ Chillverse ☆━═✨</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>✨═━☆ Chillverse ☆━═✨ — Widget (Enhanced)</title>
 <style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #0d0d0d, #000);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    min-height: 100vh;
+  :root{
+    --bg:#07070a;
+    --card-bg: rgba(20,20,22,0.6);
+    --muted:#bdbdbd;
+    --accent:#7f00ff;
+    --accent-2:#ff00ff;
+    --highlight:#ffdd00;
+    --glass: rgba(255,255,255,0.04);
+    --width:360px;
+  }
+  /* Calm theme overrides */
+  :root[data-theme='calm']{
+    --accent:#00b3cc;
+    --accent-2:#5de0a3;
+    --highlight:#ffd86b;
+    --card-bg: rgba(14,18,20,0.58);
+    --bg: linear-gradient(180deg,#071018 0%,#000814 100%);
+  }
+  /* Neon theme overrides */
+  :root[data-theme='neon']{
+    --accent:#ff0080;
+    --accent-2:#00ffd5;
+    --highlight:#ffd400;
+    --card-bg: rgba(12,6,18,0.65);
+    --bg: linear-gradient(180deg,#020005 0%,#0b001a 100%);
   }
 
-  .widget {
-    background: rgba(25, 25, 25, 0.8);
-    border-radius: 25px;
-    width: 360px;
-    padding: 24px;
-    text-align: center;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 0 30px #7f00ff66, inset 0 0 10px #00000077;
-    position: relative;
-    overflow: hidden;
-    animation: fadeIn 1s ease forwards;
+  html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial;}
+  body{
+    display:flex;align-items:center;justify-content:center;
+    background: var(--bg);
+    color:#fff;padding:28px;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
 
-  .widget::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(135deg, #7f00ff, #ff00ff, #00ffff, #ffdd00, #7f00ff);
-    background-size: 400% 400%;
-    animation: borderMove 10s linear infinite;
-    -webkit-mask: linear-gradient(#000 0 0) content-box,
-                  linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box,
-          linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    z-index: 0;
+  /* starfield canvas sits behind the widget */
+  .stage{position:relative;width:var(--width);max-width:92vw}
+  canvas#starfield{position:absolute;inset:0;border-radius:18px;z-index:0;pointer-events:none}
+
+  .widget{
+    position:relative;z-index:2;
+    width:100%;max-width:var(--width);
+    border-radius:18px;padding:20px 20px 18px 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.2));
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px var(--accent)22;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.03);
   }
 
-  @keyframes borderMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  /* animated gradient border using pseudo-element */
+  .widget::before{content:'';position:absolute;inset:-2px;border-radius:20px;padding:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--highlight),var(--accent));background-size:300% 300%;animation:slide 12s linear infinite;mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:1}
+  @keyframes slide{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+  .top{display:flex;gap:12px;align-items:center;margin-bottom:12px;position:relative;z-index:2}
+  .pfp{width:86px;height:86px;border-radius:50%;border:3px solid rgba(255,221,0,0.9);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent)}
+  .pfp img{width:100%;height:100%;object-fit:cover;display:block}
+  .title{flex:1;text-align:left}
+  .title h1{margin:0;font-size:20px;letter-spacing:0.4px;color:var(--highlight);text-shadow:0 0 8px var(--accent)}
+  .title p{margin:6px 0 0 0;font-size:13px;color:var(--muted);line-height:1.3}
+
+  .meta{display:flex;gap:10px;align-items:center;margin-top:14px;z-index:2}
+  .count-card{background:var(--glass);padding:10px 14px;border-radius:12px;display:flex;align-items:center;gap:10px;box-shadow:inset 0 -6px 18px rgba(0,0,0,0.35)}
+  .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--accent),var(--accent-2));box-shadow:0 0 8px var(--accent);}
+  #online-count{font-weight:700;font-size:16px;color:#fff}
+
+  .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));padding:9px 12px;border-radius:10px;color:#fff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(0,0,0,0.4);cursor:pointer;border:none}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);font-weight:600}
+  .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
+  .small{font-size:13px;padding:8px 10px;border-radius:9px}
+
+  /* skeleton */
+  .skeleton{height:16px;background:linear-gradient(90deg,rgba(255,255,255,0.03),rgba(255,255,255,0.06),rgba(255,255,255,0.03));background-size:200% 100%;border-radius:8px;animation:shimmer 1.6s linear infinite}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  /* theme toggles */
+  .theme-picker{display:flex;gap:8px}
+  .swatch{width:10px;height:10px;border-radius:3px;box-shadow:0 0 8px rgba(0,0,0,0.4);}
+  .swatch[data-theme='dark']{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  .swatch[data-theme='calm']{background:linear-gradient(90deg,#00b3cc,#5de0a3)}
+  .swatch[data-theme='neon']{background:linear-gradient(90deg,#ff0080,#00ffd5)}
+
+  /* QR modal */
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:9999}
+  .modal.open{display:flex}
+  .modal .card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.5));padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6);display:flex;gap:14px;align-items:center}
+
+  .hint{font-size:13px;color:var(--muted)}
+
+  /* accessibility */
+  #online-count[aria-live]{min-width:140px}
+
+  @media (prefers-reduced-motion: reduce){
+    .widget::before,canvas#starfield,.pfp{animation:none!important;transition:none!important}
+    .skeleton{animation:none}
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .server-pfp {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    border: 3px solid #ffdd00;
-    margin-bottom: 14px;
-    animation: pulse 3s infinite ease-in-out;
-    position: relative;
-    z-index: 1;
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 12px #ffdd0088; }
-    50% { transform: scale(1.08); box-shadow: 0 0 24px #ffdd00aa; }
-  }
-
-  .header {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    color: #ffdd00;
-    text-shadow: 0 0 8px #7f00ff, 0 0 15px #ff00ff;
-    z-index: 1;
-    position: relative;
-  }
-
-  .description {
-    font-size: 15px;
-    color: #ccc;
-    margin-bottom: 20px;
-    line-height: 1.6;
-    animation: fadeIn 1.2s ease forwards;
-    z-index: 1;
-    position: relative;
-  }
-
-  #online-count {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #00ffff;
-    text-shadow: 0 0 6px #7f00ff, 0 0 12px #00ffff;
-    z-index: 1;
-    position: relative;
-  }
-
-  .join-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #7f00ff, #ff00ff);
-    color: #fff;
-    text-decoration: none;
-    padding: 14px 22px;
-    border-radius: 14px;
-    font-weight: bold;
-    font-size: 16px;
-    transition: 0.3s;
-    box-shadow: 0 0 22px #7f00ff66;
-    animation: pulseBtn 2.5s infinite ease-in-out;
-    position: relative;
-    z-index: 1;
-  }
-
-  .join-btn:hover {
-    background: linear-gradient(135deg, #ff00ff, #7f00ff);
-    transform: scale(1.08);
-    box-shadow: 0 0 28px #ff00ffaa;
-  }
-
-  @keyframes pulseBtn {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 15px #7f00ff77; }
-    50% { transform: scale(1.05); box-shadow: 0 0 25px #ff00ffbb; }
-  }
-
-  @media (max-width: 480px) {
-    .widget { width: 90%; padding: 18px; }
-    .header { font-size: 20px; }
-    .description { font-size: 13px; }
-    #online-count { font-size: 14px; }
-    .join-btn { font-size: 14px; padding: 12px 18px; }
-  }
+  @media (max-width:420px){:root{--width:92vw}.top{flex-direction:row}.pfp{width:72px;height:72px}.title h1{font-size:18px}}
 </style>
 </head>
 <body>
-<div class="widget">
-  <img src="pfp.jfif" alt="Chillverse PFP" class="server-pfp">
-  <div class="header">✨═━☆ Chillverse ☆━═✨</div>
+  <div class="stage" role="region" aria-label="Chillverse server widget">
+    <canvas id="starfield" width="720" height="480" aria-hidden="true"></canvas>
 
-  <div class="description">
-    Welcome to <b>✨═━☆ Chillverse ☆━═✨</b> — where <span style="color:#ffdd00;">vibes flow</span>, voices echo, and friendships spark.  
-    Relax, explore, and let the chill take over. 🌌
+    <div class="widget" role="article">
+      <div class="top">
+        <div class="pfp" aria-hidden="true"><img src="pfp.jfif" alt="Chillverse" /></div>
+        <div class="title">
+          <h1>✨═━☆ Chillverse ☆━═✨</h1>
+          <p>An ambient space for vibes, chats & friendly hangs — relax and say hi. 🌌</p>
+        </div>
+        <div class="actions" aria-hidden="true">
+          <div class="theme-picker" title="Theme">
+            <button class="btn ghost small" id="themeBtn" aria-label="Change theme">Theme</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="count-card" aria-hidden="false">
+          <div class="dot" aria-hidden="true"></div>
+          <div>
+            <div class="hint">Server status</div>
+            <div id="online-count" aria-live="polite"><div class="skeleton" style="width:120px"></div></div>
+          </div>
+        </div>
+
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <button id="inviteBtn" class="btn" title="Join Chillverse">Join</button>
+          <button id="qrBtn" class="btn small ghost" title="Show invite QR">QR</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;z-index:2">
+        <div style="color:var(--muted);font-size:12px">Updated: <span id="updatedAt">—</span></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="copyBtn" class="btn small ghost">Copy Invite</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="online-count">Loading...</div>
-  <a class="join-btn" href="#" id="join-btn" target="_blank">Join Chillverse</a>
-</div>
+  <!-- QR Modal -->
+  <div class="modal" id="qrModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="card">
+      <div id="qrcode"></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="hint">Scan to join Chillverse</div>
+        <button id="closeQr" class="btn small">Close</button>
+      </div>
+    </div>
+  </div>
 
-<script>
-const serverID = "1413927989481308192";
-const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
-const fallbackInvite = "https://discord.gg/YOUR_INVITE_HERE"; 
+  <!-- QR lib (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-function loadWidget() {
-  fetch(apiURL)
-    .then(res => res.json())
-    .then(data => {
-      // Online count
-      const countEl = document.getElementById("online-count");
-      countEl.textContent = data.presence_count
-        ? `🟢 Online Now: ${data.presence_count} members`
-        : "Online count unavailable";
+  <script>
+  // ----- config -----
+  const serverID = '1413927989481308192';
+  const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
+  const fallbackInvite = 'https://discord.gg/rh6tYYKF5g';
+  const cacheKey = 'chillverse.widget.cache';
 
-      // Join button
-      const joinBtn = document.getElementById("join-btn");
-      joinBtn.href = data.instant_invite || fallbackInvite;
-    })
-    .catch(err => {
-      console.error("Failed to fetch widget data:", err);
-      document.getElementById("online-count").textContent = "Error loading online count";
-      document.getElementById("join-btn").href = fallbackInvite;
-    });
-}
+  // ----- DOM -----
+  const onlineEl = document.getElementById('online-count');
+  const updatedAtEl = document.getElementById('updatedAt');
+  const inviteBtn = document.getElementById('inviteBtn');
+  const qrBtn = document.getElementById('qrBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const qrModal = document.getElementById('qrModal');
+  const qrcodeWrap = document.getElementById('qrcode');
 
-loadWidget();
-setInterval(loadWidget, 15000);
-</script>
+  // keep current invite
+  let currentInvite = fallbackInvite;
+
+  // small helper to set text with fade
+  function showOnlineText(text){
+    // remove skeleton if present
+    if(onlineEl.querySelector('.skeleton')){
+      onlineEl.innerHTML = '';
+    }
+    const prev = onlineEl.textContent;
+    if(prev === text) return; // no change
+    onlineEl.style.opacity = 0;
+    setTimeout(()=>{ onlineEl.textContent = text; onlineEl.style.transition = 'opacity 300ms'; onlineEl.style.opacity = 1 }, 180);
+  }
+
+  // fetch with caching and exponential backoff
+  async function fetchWidget(){
+    // check cache
+    try{
+      const cache = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if(cache && Date.now() - cache.t < 30*1000){
+        applyData(cache.data, true);
+        return;
+      }
+    }catch(e){/* ignore */}
+
+    let attempts = 0;
+    let backoff = 700;
+    while(attempts < 4){
+      try{
+        const res = await fetch(apiURL, {cache: 'no-store'});
+        if(!res.ok) throw new Error('network');
+        const data = await res.json();
+        localStorage.setItem(cacheKey, JSON.stringify({t:Date.now(), data}));
+        applyData(data);
+        return;
+      }catch(err){
+        attempts++;
+        await new Promise(r=>setTimeout(r, backoff));
+        backoff *= 2;
+      }
+    }
+    // failed: show fallback
+    showOnlineText('Unable to load');
+    updatedAtEl.textContent = new Date().toLocaleString();
+    inviteBtn.onclick = ()=> window.open(fallbackInvite, '_blank');
+  }
+
+  function applyData(data, fromCache=false){
+    const count = (data && data.presence_count) || 0;
+    showOnlineText(`🟢 Online: ${count} members`);
+    updatedAtEl.textContent = new Date().toLocaleString();
+    currentInvite = (data && data.instant_invite) || fallbackInvite;
+    inviteBtn.onclick = ()=> window.open(currentInvite, '_blank');
+  }
+
+  // initial fetch
+  fetchWidget();
+  // poll but rely on cache to avoid excessive calls
+  setInterval(fetchWidget, 15_000);
+
+  // copy invite
+  copyBtn.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(currentInvite); copyBtn.textContent = 'Copied!'; setTimeout(()=>copyBtn.textContent='Copy Invite',1600);
+    }catch(e){copyBtn.textContent='Copy failed'}
+  });
+
+  // QR modal
+  qrBtn.addEventListener('click', ()=>{
+    qrModal.classList.add('open'); qrModal.setAttribute('aria-hidden','false');
+    qrcodeWrap.innerHTML = '';
+    new QRCode(qrcodeWrap, {text: currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'});
+  });
+  document.getElementById('closeQr').addEventListener('click', closeQr);
+  qrModal.addEventListener('click', (ev)=>{ if(ev.target === qrModal) closeQr(); });
+  function closeQr(){ qrModal.classList.remove('open'); qrModal.setAttribute('aria-hidden','true'); qrcodeWrap.innerHTML = ''; }
+
+  // Theme toggle: cycle between dark, calm, neon
+  const themes = ['dark','calm','neon'];
+  let idx = 0;
+  function setTheme(t){ document.documentElement.setAttribute('data-theme', t); document.documentElement.style.setProperty('--theme',t); }
+  document.getElementById('themeBtn').addEventListener('click', ()=>{ idx = (idx+1)%themes.length; setTheme(themes[idx]); localStorage.setItem('chill.theme',themes[idx]); });
+  // hydrate
+  try{ const saved = localStorage.getItem('chill.theme'); if(saved) { idx = themes.indexOf(saved); if(idx<0) idx=0; setTheme(themes[idx]); }}catch(e){}
+
+  // --- starfield (subtle, low cpu) ---
+  (function starfield(){
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = canvas.offsetWidth * devicePixelRatio;
+    let h = canvas.height = canvas.offsetHeight * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    const PARTICLES = 45; // very subtle
+    const stars = [];
+    function rand(min,max){return Math.random()*(max-min)+min}
+    for(let i=0;i<PARTICLES;i++){
+      stars.push({x:rand(0,canvas.offsetWidth), y:rand(0,canvas.offsetHeight), r:rand(0.3,1.8), vx:rand(-0.02,0.02), vy:rand(0.05,0.35)})
+    }
+
+    function resize(){
+      canvas.width = canvas.offsetWidth * devicePixelRatio;
+      canvas.height = canvas.offsetHeight * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    }
+    window.addEventListener('resize', ()=>{ resize(); });
+
+    let last=0;
+    function draw(t){
+      // throttle to ~30fps
+      if(t - last < 32){ requestAnimationFrame(draw); return; }
+      last = t;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // gentle vignette
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      for(const s of stars){
+        s.x += s.vx; s.y += s.vy;
+        if(s.y > canvas.offsetHeight + 6) { s.y = -6; s.x = Math.random()*canvas.offsetWidth; }
+        if(s.x < -10) s.x = canvas.offsetWidth+10; if(s.x > canvas.offsetWidth+10) s.x = -10;
+        const g = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*6);
+        g.addColorStop(0, "rgba(255,255,255,"+ (0.85 * (s.r/1.8)) +")");
+        g.addColorStop(0.6, "rgba(255,255,255,0.12)");
+        g.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw(0);
+  })();
+
+  // Respect prefers-reduced-motion: stop the starfield animations if user prefers reduced motion
+  const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if(media.matches){ const c = document.getElementById('starfield'); if(c && c.parentNode) c.parentNode.removeChild(c); }
+
+  // Ensure widget is keyboard accessible
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeQr(); });
+  </script>
 </body>
 </html>
