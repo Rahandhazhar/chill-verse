@@ -6,89 +6,53 @@
 <title>Chillverse</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --accent:#7b86ff;
-    --glass: rgba(255,255,255,0.03);
-    --card-radius:18px;
-  }
+  :root{--accent:#7b86ff;--glass: rgba(255,255,255,0.03);--card-radius:18px}
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#eef3ff}
   body{
-    background:
-      linear-gradient(180deg, rgba(6,8,12,0.6), rgba(8,10,12,0.8)),
-      url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600&auto=format&fit=crop&crop=entropy");
-    background-size:cover;
-    background-position:center;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+    background: linear-gradient(180deg, rgba(6,8,12,0.6), rgba(8,10,12,0.8)),
+    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600&auto=format&fit=crop&crop=entropy");
+    background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;padding:28px;
   }
-
-  .wrap{width:460px;max-width:calc(100% - 40px);position:relative;z-index:3}
-  .card{
-    border-radius:var(--card-radius);
-    overflow:hidden;
-    background:linear-gradient(180deg, rgba(12,14,17,0.62), rgba(8,9,11,0.52));
-    padding:18px;border:1px solid rgba(255,255,255,0.02);
-    box-shadow:0 18px 60px rgba(2,6,12,0.7);
-    backdrop-filter: blur(10px) saturate(1.02);
-  }
-
+  .wrap{width:480px;max-width:calc(100% - 40px);position:relative;z-index:3}
+  .card{border-radius:var(--card-radius);overflow:hidden;background:linear-gradient(180deg, rgba(12,14,17,0.62), rgba(8,9,11,0.52));padding:18px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 18px 60px rgba(2,6,12,0.7);backdrop-filter: blur(10px) saturate(1.02)}
   .header{display:flex;gap:14px;align-items:center}
   .server-icon{width:92px;height:92px;border-radius:16px;overflow:hidden;flex:0 0 92px;background:linear-gradient(135deg,rgba(255,255,255,0.02),transparent);display:grid;place-items:center;border:1px solid rgba(255,255,255,0.02)}
   .server-icon img{width:100%;height:100%;object-fit:cover;display:block}
-
   .title h1{margin:0;font-size:20px;font-weight:700;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .desc{margin:8px 0 0;color:rgba(234,240,255,0.75);font-size:13px}
-
   .status-row{display:flex;gap:10px;align-items:center;margin-top:12px}
-  .pill{
-    padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
-    font-weight:700;color:var(--accent);font-size:13px;border:1px solid rgba(123,134,255,0.10);
-  }
+  .pill{padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);font-weight:700;color:var(--accent);font-size:13px;border:1px solid rgba(123,134,255,0.10)}
   .meta{color:rgba(234,240,255,0.65);font-size:13px;margin-left:6px}
-
   .invite-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px}
   .join-btn{background:linear-gradient(90deg,var(--accent),#5b6eff);color:white;padding:12px 16px;border-radius:12px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:10px;border:none;cursor:pointer;box-shadow:0 10px 30px rgba(91,110,255,0.14)}
-  .join-btn:hover{transform:translateY(-3px);transition:all .18s ease}
-
   .player{margin-top:18px;display:flex;gap:12px;align-items:center}
   .album{width:90px;height:90px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))}
   .album img{width:100%;height:100%;object-fit:cover}
-
   .controls{flex:1;min-width:0}
   .track-title{font-weight:800;margin:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .track-meta{margin-top:6px;font-size:13px;color:rgba(234,240,255,0.78)}
-
   .buttons{display:flex;align-items:center;gap:8px;margin-top:12px}
   .btn{background:var(--glass);padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;font-weight:700;color:#eaf0ff}
-  .btn:hover{transform:translateY(-2px);transition:all .15s ease}
-
   .volume{display:flex;align-items:center;gap:8px;margin-left:8px}
   .volume input[type=range]{width:120px}
-
   .progress{height:6px;background:rgba(255,255,255,0.04);border-radius:6px;margin-top:12px;overflow:hidden}
   .progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#4fb0ff)}
-
   .status-msg{margin-top:10px;font-size:13px;color:rgba(234,240,255,0.7)}
   .upload-row{display:flex;gap:8px;align-items:center;margin-top:10px}
-
   input[type=file]{display:none}
   .upload-btn{background:transparent;border:1px dashed rgba(255,255,255,0.08);padding:8px 12px;border-radius:10px;color:rgba(234,240,255,0.85);cursor:pointer}
-  .upload-btn:hover{border-color:rgba(123,134,255,0.18)}
-
-  @media (max-width:520px){
-    .wrap{width:100%}
-    .server-icon{width:78px;height:78px}
-    .album{width:72px;height:72px}
-  }
+  .use-url{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .use-url input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  .use-url button{padding:8px 10px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),#5b6eff);color:white;cursor:pointer}
+  @media (max-width:520px){.wrap{width:100%}.server-icon{width:78px;height:78px}.album{width:72px;height:72px}}
+  /* Tap-to-enable overlay */
+  #enableSound{position:fixed;inset:0;display:none;z-index:9999;align-items:center;justify-content:center;background:rgba(6,8,12,0.35)}
+  #enableSound button{padding:14px 22px;border-radius:12px;border:none;background:linear-gradient(90deg,#7b86ff,#5b6eff);color:white;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
-  <div class="wrap" id="wrap">
+  <div class="wrap">
     <div class="card" role="region" aria-label="Chillverse server widget">
       <div class="header">
         <div class="server-icon" id="serverIconWrap"><img id="serverIcon" src="" alt="server icon"></div>
@@ -103,10 +67,7 @@
       </div>
 
       <div class="invite-row">
-        <a id="joinBtn" class="join-btn" href="https://discord.gg/9C6VF4KFkV" target="_blank" rel="noopener noreferrer">
-          Join Chillverse
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="rgba(255,255,255,0.95)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+        <a id="joinBtn" class="join-btn" href="https://discord.gg/9C6VF4KFkV" target="_blank" rel="noopener noreferrer">Join Chillverse</a>
       </div>
 
       <div class="player" aria-hidden="false">
@@ -124,21 +85,28 @@
             </div>
           </div>
 
-          <div class="progress" title="progress">
-            <i id="progressBar"></i>
-          </div>
+          <div class="progress" title="progress"><i id="progressBar"></i></div>
 
           <div class="status-msg" id="statusMsg">Initializing audio...</div>
 
-          <div class="upload-row" style="display:none" id="uploadRow">
+          <div class="use-url">
+            <input id="publicUrlInput" placeholder="Paste public MP3 URL (Vercel or GitHub raw)"/>
+            <button id="useUrlBtn">Use URL</button>
+          </div>
+
+          <div class="upload-row" id="uploadRow" style="display:none">
             <label class="upload-btn" id="uploadLabel" for="uploadInput">Upload audio (MP3/OGG)</label>
             <input type="file" id="uploadInput" accept="audio/*">
             <button class="btn" id="clearUpload" style="display:none">Clear</button>
           </div>
+
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Tap-to-enable overlay -->
+  <div id="enableSound"><button id="enableSoundBtn">Tap to enable sound</button></div>
 
   <!-- audio element -->
   <audio id="bgAudio" loop crossorigin="anonymous" preload="auto"></audio>
@@ -149,11 +117,9 @@
   const WIDGET_JSON = `https://discord.com/api/guilds/${GUILD_ID}/widget.json`;
   const INVITE_CODE = "9C6VF4KFkV";
   const INVITE_API = `https://discord.com/api/v10/invites/${INVITE_CODE}?with_counts=true&with_expiration=true`;
+  const defaultIcon = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='100%' height='100%' rx='40' fill='#1e2328'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='160' fill='#cfe0ff' font-family='Arial'>C</text></svg>`);
 
-  const defaultIcon = "data:image/svg+xml;utf8," + encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='100%' height='100%' rx='40' fill='#1e2328'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='160' fill='#cfe0ff' font-family='Arial'>C</text></svg>`
-  );
-
+  // Elements
   const serverNameEl = document.getElementById("serverName");
   const serverDescEl = document.getElementById("serverDesc");
   const serverIconImg = document.getElementById("serverIcon");
@@ -170,77 +136,83 @@
   const uploadRow = document.getElementById("uploadRow");
   const uploadInput = document.getElementById("uploadInput");
   const clearUpload = document.getElementById("clearUpload");
-  const uploadLabel = document.getElementById("uploadLabel");
+  const enableSound = document.getElementById("enableSound");
+  const enableBtn = document.getElementById("enableSoundBtn");
+  const publicUrlInput = document.getElementById("publicUrlInput");
+  const useUrlBtn = document.getElementById("useUrlBtn");
 
-  // audio sources to try (ordered). Keep a local upload option if these fail.
-  const audioSources = [
-    "https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3",
-    "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3"
+  // Default candidate sources:
+  // 1) try Vercel-style (same origin) path: location.origin + '/mixkit-serene-view-443.mp3'
+  // 2) then try any previously saved public URL in localStorage
+  // 3) final fallback to a stable external sample
+  const candidateSources = [
+    () => (location.origin + "/mixkit-serene-view-443.mp3"),
+    () => (localStorage.getItem("chill_audio_url") || ""),
+    () => "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3"
   ];
 
-  let srcIndex = 0;
+  let tryIndex = 0;
   let isPlaying = false;
   let usingLocalFile = false;
 
-  function setSource(index){
-    if(index < 0 || index >= audioSources.length) return;
-    bgAudio.src = audioSources[index];
-    try { bgAudio.load(); } catch(e) {}
-    statusMsg.textContent = `Trying audio source ${index+1} of ${audioSources.length}...`;
+  // set source by trying candidate functions in order
+  function tryNextSource(){
+    if(usingLocalFile) return;
+    if(tryIndex >= candidateSources.length) {
+      // no sources left
+      statusMsg.textContent = "No remote audio available. Upload a file or paste a public MP3 URL.";
+      uploadRow.style.display = "flex";
+      return;
+    }
+    const url = candidateSources[tryIndex]();
+    tryIndex++;
+    if(!url) {
+      // skip empty and try next
+      tryNextSource();
+      return;
+    }
+    // set and attempt load/play (muted first to appease autoplay)
+    statusMsg.textContent = `Trying audio source ${tryIndex}: ${url}`;
+    bgAudio.src = url;
+    bgAudio.load();
+    bgAudio.muted = true;
+    bgAudio.play().then(()=> {
+      statusMsg.textContent = "Muted playback started (click Play to hear).";
+      isPlaying = true;
+      playBtn.textContent = "Pause ❚❚";
+      enableSound.style.display = "none";
+    }).catch(()=> {
+      // autoplay blocked maybe -> show overlay
+      enableSound.style.display = "flex";
+      statusMsg.textContent = "Autoplay blocked or remote blocked. Click Tap to enable or paste a URL.";
+    });
   }
 
-  // initial attempt: set first source and attempt muted autoplay
-  setSource(srcIndex);
-  bgAudio.muted = true;
-  bgAudio.volume = parseFloat(volumeSlider.value);
-
-  // try to play muted to warm up the audio without user interaction
-  bgAudio.play().then(()=> {
-    statusMsg.textContent = "Muted playback started (click Play to hear).";
-    isPlaying = true;
-    playBtn.textContent = "Pause ❚❚";
-  }).catch(()=> {
-    // autoplay blocked or source CORS blocked; still attempt to load
-    statusMsg.textContent = "Autoplay blocked or remote blocked. Click Play. If audio fails, upload your own file.";
-  });
-
-  // on error -> try next source
+  // Listen for network or decode errors to try next fallback
   bgAudio.addEventListener("error", ()=>{
-    console.warn("Audio error for source", srcIndex, bgAudio.currentSrc);
-    srcIndex++;
-    if(srcIndex < audioSources.length){
-      setSource(srcIndex);
-      // try muted play again
-      bgAudio.muted = true;
-      bgAudio.play().catch(()=>{});
-    } else {
-      // all remote sources failed — offer upload
-      statusMsg.textContent = "Audio unavailable from hosted sources. You can upload a local audio file to play.";
-      uploadRow.style.display = "flex";
-      trackTitle.textContent = "No remote audio";
-      trackArtist.textContent = "";
-    }
+    console.warn("Audio error. src:", bgAudio.currentSrc);
+    tryNextSource();
   });
 
-  // progress update
+  // loadedmetadata updates status
+  bgAudio.addEventListener("loadedmetadata", ()=>{
+    if(usingLocalFile){
+      statusMsg.textContent = "Local audio loaded — click Play.";
+    } else {
+      statusMsg.textContent = "Remote audio loaded (muted). Click Play then Unmute.";
+    }
+    trackTitle.textContent = trackTitle.textContent || "Serene Mix";
+    trackArtist.textContent = trackArtist.textContent || "Calm ambient";
+  });
+
+  // timeupdate -> progress
   bgAudio.addEventListener("timeupdate", ()=>{
     if(!bgAudio.duration || isNaN(bgAudio.duration)) return;
     const pct = (bgAudio.currentTime / bgAudio.duration) * 100;
     progressBar.style.width = pct + "%";
   });
 
-  // when metadata loads, show track length if possible
-  bgAudio.addEventListener("loadedmetadata", ()=>{
-    if(!usingLocalFile){
-      trackTitle.textContent = "Serene Mix";
-      trackArtist.textContent = "Calm ambient — remote";
-      statusMsg.textContent = bgAudio.muted ? "Loaded (muted). Click Play then Unmute." : "Loaded — playing.";
-    } else {
-      statusMsg.textContent = "Local audio loaded — click Play to listen.";
-    }
-  });
-
-  // play/pause button
+  // play/pause
   playBtn.addEventListener("click", async ()=>{
     if(!isPlaying){
       try {
@@ -250,9 +222,8 @@
         statusMsg.textContent = bgAudio.muted ? "Playing (muted). Unmute to hear." : "Playing";
       } catch(err){
         console.warn("Play blocked", err);
-        statusMsg.textContent = "Playback blocked by browser — try clicking Unmute or upload a file.";
-        // allow user to interact: show upload
-        uploadRow.style.display = "flex";
+        statusMsg.textContent = "Playback blocked — try Tap to enable or upload a file.";
+        enableSound.style.display = "flex";
       }
     } else {
       bgAudio.pause();
@@ -262,20 +233,38 @@
     }
   });
 
-  // mute button
+  // mute/unmute
   muteBtn.addEventListener("click", ()=>{
     bgAudio.muted = !bgAudio.muted;
     muteBtn.textContent = bgAudio.muted ? "Muted" : "Unmuted";
     statusMsg.textContent = bgAudio.muted ? "Muted" : "Unmuted";
   });
 
+  // volume control
   volumeSlider.addEventListener("input", ()=>{
     bgAudio.volume = parseFloat(volumeSlider.value);
     if(bgAudio.volume === 0){ bgAudio.muted = true; muteBtn.textContent = "Muted"; }
     else { bgAudio.muted = false; muteBtn.textContent = "Unmuted"; }
   });
 
-  // Upload local file: plays in-place and overrides remote sources for the session
+  // enable overlay click
+  enableBtn.addEventListener("click", async ()=>{
+    try {
+      bgAudio.muted = false;
+      await bgAudio.play();
+      enableSound.style.display = "none";
+      statusMsg.textContent = "Playing — Unmuted";
+    } catch(e){
+      console.warn("Enable click fallback", e);
+      bgAudio.muted = true;
+      await bgAudio.play().catch(()=>{});
+      bgAudio.muted = false;
+      enableSound.style.display = "none";
+      statusMsg.textContent = "Playing (unmute if needed)";
+    }
+  });
+
+  // upload local file
   uploadInput.addEventListener("change", (e)=>{
     const file = e.target.files && e.target.files[0];
     if(!file) return;
@@ -296,22 +285,27 @@
   });
 
   clearUpload.addEventListener("click", ()=>{
-    // clear local file and revert to remote source attempts
     usingLocalFile = false;
     uploadInput.value = "";
     clearUpload.style.display = "none";
-    srcIndex = 0;
-    setSource(srcIndex);
-    bgAudio.load();
-    bgAudio.muted = true;
-    bgAudio.play().catch(()=>{});
-    trackTitle.textContent = "Serene Mix";
-    trackArtist.textContent = "Calm ambient — remote";
-    statusMsg.textContent = "Reverted to remote sources. Click Play.";
+    // revert to remote tries
+    tryIndex = 0;
+    tryNextSource();
     uploadRow.style.display = "none";
   });
 
-  // PFP + widget JSON loading (same robust fallbacks)
+  // Use URL button: store to localStorage and try it immediately
+  useUrlBtn.addEventListener("click", ()=>{
+    const val = publicUrlInput.value.trim();
+    if(!val) return;
+    localStorage.setItem("chill_audio_url", val);
+    statusMsg.textContent = "Saved URL — trying now...";
+    tryIndex = 0;
+    // place saved URL as candidateSources[1], then try next
+    tryNextSource();
+  });
+
+  // Widget JSON + icon fallbacks
   async function tryInviteFallback(){
     try {
       const r = await fetch(INVITE_API, {cache: "no-store"});
@@ -333,16 +327,12 @@
       const res = await fetch(WIDGET_JSON, {cache: "no-store"});
       if(!res.ok) throw new Error("widget fetch failed: " + res.status);
       const data = await res.json();
-
       serverNameEl.textContent = data.name || "Chillverse";
       serverDescEl.textContent = data.instant_invite ? "Live — click Join" : "Invite available";
-
       const online = (typeof data.presence_count !== "undefined") ? data.presence_count : (Array.isArray(data.members) ? data.members.filter(m=>m.status && m.status !== "offline").length : "—");
       const total = (Array.isArray(data.members) ? data.members.length : (typeof data.members_count !== "undefined" ? data.members_count : "—"));
-
       onlinePill.innerHTML = `● Online: ${online}`;
       memberCount.textContent = `Members: ${total}`;
-
       if(data.icon_url){
         serverIconImg.src = data.icon_url;
       } else if(data.id && data.icon){
@@ -361,8 +351,12 @@
     }
   }
 
-  // initialize
+  // init: load widget + attempt audio
   loadWidget();
+  // small delay to allow localStorage check before trying
+  setTimeout(()=> { tryNextSource(); }, 220);
+
+  // refresh widget periodically
   setInterval(loadWidget, 90000);
 })();
 </script>
