@@ -3,327 +3,307 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Chillverse — Server Widget</title>
+<title>Chillverse</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --accent:#6C7CFF;
-    --glass: rgba(255,255,255,0.04);
-    --glass-2: rgba(255,255,255,0.03);
-    --card-radius:18px;
+    --accent:#7b86ff;
+    --glass: rgba(255,255,255,0.03);
+    --card-radius:20px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e9eef8}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#eaf0ff}
   body{
-    background:linear-gradient(180deg, rgba(15,18,25,0.85), rgba(8,10,12,0.85)), #0b0c0f;
+    background:
+      linear-gradient(180deg, rgba(6,8,12,0.6), rgba(8,10,12,0.8)),
+      url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600&auto=format&fit=crop&crop=entropy");
+    background-size:cover;
+    background-position:center;
     display:flex;
     align-items:center;
     justify-content:center;
     padding:28px;
-    /* background image (unsplash random calm sea). change query to taste */
-    background-image:
-      radial-gradient(circle at 10% 10%, rgba(255,255,255,0.02), transparent 10%),
-      url("https://source.unsplash.com/1600x900/?calm,sea,sunset");
-    background-size:cover;
-    background-position:center;
-    filter: saturate(0.9) contrast(1.02);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
   }
-
-  /* subtle overlay */
-  .overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(5,8,12,0.55), rgba(12,14,16,0.65));
-    pointer-events: none;
-  }
-
-  .wrap {
-    position: relative;
-    z-index: 2;
-    width: 420px;
-    max-width:calc(100% - 48px);
-  }
-
-  .card {
-    border-radius: var(--card-radius);
-    overflow: hidden;
-    background: linear-gradient(180deg, rgba(12,14,16,0.6), rgba(10,11,12,0.6));
-    box-shadow: 0 12px 40px rgba(2,6,12,0.7), 0 2px 8px rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.03);
-    backdrop-filter: blur(10px) saturate(1.1);
-    padding: 18px;
-  }
-
-  .top {
-    display:flex;
-    align-items:center;
-    gap:14px;
-  }
-
-  .server-icon {
-    width:84px;
-    height:84px;
-    border-radius:16px;
-    flex:0 0 84px;
+  .wrap{width:460px;max-width:calc(100% - 40px);position:relative;z-index:3}
+  .card{
+    border-radius:var(--card-radius);
     overflow:hidden;
-    background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    display:grid;
-    place-items:center;
-    border: 1px solid rgba(255,255,255,0.02);
+    background:linear-gradient(180deg, rgba(12,14,17,0.6), rgba(8,9,11,0.5));
+    padding:18px;border:1px solid rgba(255,255,255,0.025);
+    box-shadow:0 18px 60px rgba(2,6,12,0.7);
+    backdrop-filter: blur(10px) saturate(1.02);
   }
 
+  .header{display:flex;gap:14px;align-items:center}
+  .server-icon{width:92px;height:92px;border-radius:16px;overflow:hidden;flex:0 0 92px;background:linear-gradient(135deg,rgba(255,255,255,0.02),transparent);display:grid;place-items:center;border:1px solid rgba(255,255,255,0.02)}
   .server-icon img{width:100%;height:100%;object-fit:cover;display:block}
 
-  .title {
-    flex:1;
-    min-width:0;
-  }
-  .title h1{
-    margin:0;font-size:20px;font-weight:700;line-height:1.05;
-    text-overflow:ellipsis;white-space:nowrap;overflow:hidden;
-  }
-  .title p{
-    margin:6px 0 0;font-size:13px;color:rgba(233,238,248,0.75);
-  }
+  .title h1{margin:0;font-size:20px;font-weight:700;line-height:1.05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .desc{margin:8px 0 0;color:rgba(234,240,255,0.75);font-size:13px}
 
-  .status-row{
-    display:flex;
-    gap:10px;
-    margin-top:12px;
-    align-items:center;
+  .status-row{display:flex;gap:10px;align-items:center;margin-top:12px}
+  .pill{
+    padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+    font-weight:700;color:var(--accent);font-size:13px;border:1px solid rgba(123,134,255,0.10);
   }
-  .pill {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    padding:8px 12px;border-radius:999px;
-    font-weight:600;font-size:13px;color:var(--accent);
-    display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(108,124,255,0.12)
-  }
+  .meta{color:rgba(234,240,255,0.65);font-size:13px;margin-left:6px}
 
-  .big-invite{
-    margin-top:16px;
-    display:flex;gap:10px;align-items:center;justify-content:space-between;
-  }
+  .invite-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px}
+  .join-btn{background:linear-gradient(90deg,var(--accent),#5b6eff);color:white;padding:12px 16px;border-radius:12px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:10px;border:none;cursor:pointer;box-shadow:0 10px 30px rgba(91,110,255,0.14)}
+  .join-btn:hover{transform:translateY(-3px);transition:all .18s ease}
 
-  .join-btn{
-    background: linear-gradient(90deg,var(--accent), #5670ff);
-    color:white;padding:12px 16px;border-radius:12px;font-weight:700;text-decoration:none;
-    display:inline-flex;align-items:center;gap:10px;border:none;cursor:pointer;
-    box-shadow: 0 6px 18px rgba(92,103,255,0.18);
-  }
-  .join-btn:hover{transform:translateY(-2px);transition:transform .18s ease}
-
-  .player {
-    margin-top:16px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-
-  .album {
-    width:70px;height:70px;border-radius:10px;overflow:hidden;flex:0 0 70px;
-    background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    display:grid;place-items:center;border:1px solid rgba(255,255,255,0.02);
-  }
+  .player{margin-top:18px;display:flex;gap:12px;align-items:center}
+  .album{width:90px;height:90px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))}
   .album img{width:100%;height:100%;object-fit:cover}
 
   .controls{flex:1;min-width:0}
-  .track-title{font-weight:700;margin:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .track-artist{margin:6px 0 0;color:rgba(233,238,248,0.75);font-size:13px}
+  .track-title{font-weight:800;margin:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .track-meta{margin-top:6px;font-size:13px;color:rgba(234,240,255,0.78)}
 
-  .controls .buttons{display:flex;align-items:center;gap:8px;margin-top:10px}
-  .btn {
-    background:var(--glass);
-    border-radius:10px;padding:8px 10px;border:1px solid rgba(255,255,255,0.02);
-    cursor:pointer;font-weight:600;color:#dfe7ff;
-  }
-  .btn:hover{transform:translateY(-2px);transition:all .18s ease}
-  .volume {display:flex;align-items:center;gap:8px;margin-left:8px}
-  .volume input[type=range]{width:110px}
+  .buttons{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .btn{background:var(--glass);padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;font-weight:700;color:#eaf0ff}
+  .btn:hover{transform:translateY(-2px);transition:all .15s ease}
 
-  .footer-note{margin-top:14px;color:rgba(233,238,248,0.6);font-size:12px;text-align:center}
-  .small {font-size:11px;color:rgba(233,238,248,0.55)}
+  .volume{display:flex;align-items:center;gap:8px;margin-left:8px}
+  .volume input[type=range]{width:120px}
 
-  /* responsive */
-  @media (max-width:460px){
-    .top{flex-direction:row}
-    .server-icon{width:72px;height:72px}
-    .album{width:56px;height:56px}
+  .progress{height:6px;background:rgba(255,255,255,0.04);border-radius:6px;margin-top:12px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#4fb0ff)}
+
+  .note{font-size:12px;margin-top:14px;color:rgba(234,240,255,0.6);text-align:center}
+
+  @media (max-width:520px){
+    .wrap{width:100%}
+    .server-icon{width:78px;height:78px}
+    .album{width:72px;height:72px}
   }
 </style>
 </head>
 <body>
-  <div class="overlay" aria-hidden="true"></div>
-
   <div class="wrap">
     <div class="card" role="region" aria-label="Chillverse server widget">
-      <div class="top">
-        <div class="server-icon" id="serverIconWrap" title="Server icon">
-          <!-- server icon inserted by JS -->
-          <img id="serverIcon" alt="server icon" src="">
-        </div>
-
-        <div class="title">
+      <div class="header">
+        <div class="server-icon" id="serverIconWrap"><img id="serverIcon" src="" alt="server icon"></div>
+        <div style="flex:1;min-width:0">
           <h1 id="serverName">Loading Chillverse...</h1>
-          <p id="serverDesc">Welcome — step into the chill.</p>
-
+          <div class="desc" id="serverDesc">Welcome — loading server info...</div>
           <div class="status-row">
             <div class="pill" id="onlinePill">● Online: —</div>
-            <div class="small" id="memberCount" style="margin-left:6px;color:rgba(233,238,248,0.68)">Members: —</div>
+            <div class="meta" id="memberCount">Members: —</div>
           </div>
         </div>
       </div>
 
-      <div class="big-invite">
-        <a id="joinBtn" class="join-btn" href="https://discord.gg/9C6VF4KFkV" target="_blank" rel="noopener">
+      <div class="invite-row">
+        <a id="joinBtn" class="join-btn" href="https://discord.gg/9C6VF4KFkV" target="_blank" rel="noopener noreferrer">
           Join Chillverse
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.95"><path d="M12 2v20M2 12h20" stroke="rgba(255,255,255,0.9)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="rgba(255,255,255,0.95)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
 
       <div class="player" aria-hidden="false">
-        <div class="album" id="albumWrap">
-          <img id="albumArt" alt="album art" src="">
-        </div>
-
+        <div class="album"><img id="albumArt" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop&crop=entropy" alt="album art"></div>
         <div class="controls">
-          <div class="track-title" id="trackTitle">Serene View</div>
-          <div class="track-artist" id="trackArtist">Arulo — Mixkit (royalty-free)</div>
+          <div class="track-title" id="trackTitle">Serene Mix</div>
+          <div class="track-meta" id="trackArtist">Calm ambient — royalty-free</div>
 
           <div class="buttons">
             <button class="btn" id="playBtn">Play ▶</button>
             <button class="btn" id="muteBtn">Muted</button>
-
             <div class="volume">
-              <label class="small">Vol</label>
-              <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.55" />
+              <label class="meta" style="margin-right:6px">Vol</label>
+              <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.55">
             </div>
+          </div>
+
+          <div class="progress" title="progress">
+            <i id="progressBar"></i>
           </div>
         </div>
       </div>
 
-      <div class="footer-note">
-        Music: Serene View — Mixkit (free). Background images from Unsplash. If server icon doesn’t appear, the server may have no icon or the widget is disabled. :contentReference[oaicite:2]{index=2}
+      <div class="note" id="footerNote">
+        Music: royalty-free (Mixkit/Pixabay fallback). If audio is blocked by browser, press Play and then Unmute. If the server icon doesn't load, widget or server icon may be disabled — the widget tries extra fallbacks automatically. :contentReference[oaicite:2]{index=2}
       </div>
     </div>
   </div>
 
-  <!-- Audio element (uses a Mixkit preview; if this 1-line link ever 404s you can swap to any MP3 URL) -->
-  <audio id="bgAudio" loop crossorigin="anonymous">
-    <source src="https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3" type="audio/mpeg">
-    Your browser does not support HTML audio.
-  </audio>
+  <!-- Audio element (we add fallback URLs via JS and listen for errors) -->
+  <audio id="bgAudio" loop crossorigin="anonymous" preload="auto"></audio>
 
 <script>
-  (function(){
-    const GUILD_ID = "1413927989481308192";
-    const WIDGET_JSON = `https://discord.com/api/guilds/${GUILD_ID}/widget.json`;
-    const cdnIcon = (id, icon) => `https://cdn.discordapp.com/icons/${id}/${icon}.png?size=512`;
-    const defaultIcon = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='100%' height='100%' rx='40' fill='%23282b2f'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='120' fill='%23cdd6f4' font-family='Arial'>C</text></svg>";
+(function(){
+  const GUILD_ID = "1413927989481308192";
+  const WIDGET_JSON = `https://discord.com/api/guilds/${GUILD_ID}/widget.json`;
+  // invite code from provided invite link (user-provided)
+  const INVITE_CODE = "9C6VF4KFkV";
+  const INVITE_API = `https://discord.com/api/v10/invites/${INVITE_CODE}?with_counts=true&with_expiration=true`;
 
-    // elements
-    const serverName = document.getElementById("serverName");
-    const serverDesc = document.getElementById("serverDesc");
-    const serverIconImg = document.getElementById("serverIcon");
-    const onlinePill = document.getElementById("onlinePill");
-    const memberCount = document.getElementById("memberCount");
-    const albumArt = document.getElementById("albumArt");
-    const trackTitle = document.getElementById("trackTitle");
-    const trackArtist = document.getElementById("trackArtist");
-    const playBtn = document.getElementById("playBtn");
-    const muteBtn = document.getElementById("muteBtn");
-    const volumeSlider = document.getElementById("volumeSlider");
-    const bgAudio = document.getElementById("bgAudio");
+  const defaultIcon = "data:image/svg+xml;utf8," + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512'><rect width='100%' height='100%' rx='40' fill='#1e2328'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='160' fill='#cfe0ff' font-family='Arial'>C</text></svg>`
+  );
 
-    // prefill album art and audio metadata
-    albumArt.src = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop&crop=entropy";
-    trackTitle.textContent = "Serene View";
-    trackArtist.textContent = "Arulo — Mixkit (royalty-free)";
+  const serverNameEl = document.getElementById("serverName");
+  const serverDescEl = document.getElementById("serverDesc");
+  const serverIconImg = document.getElementById("serverIcon");
+  const onlinePill = document.getElementById("onlinePill");
+  const memberCount = document.getElementById("memberCount");
+  const bgAudio = document.getElementById("bgAudio");
+  const playBtn = document.getElementById("playBtn");
+  const muteBtn = document.getElementById("muteBtn");
+  const volumeSlider = document.getElementById("volumeSlider");
+  const trackTitle = document.getElementById("trackTitle");
+  const trackArtist = document.getElementById("trackArtist");
+  const progressBar = document.getElementById("progressBar");
 
-    // audio default
-    bgAudio.volume = parseFloat(volumeSlider.value);
-    bgAudio.muted = true; // start muted — browsers require user interaction for sound
-    let isPlaying = false;
+  // Audio sources (try in order). Replace or add your own hosted MP3 if you have one.
+  // 1) Mixkit preview (may be blocked sometimes) - good royalty-free option.
+  // 2) File-Examples fallback (stable public sample file).
+  // You can replace either URL with a hosted MP3 that you control for guaranteed reliability.
+  const audioSources = [
+    "https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3", // Mixkit (nice calm)
+    "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // public fallback
+  ];
 
-    // Play / Pause logic
-    playBtn.addEventListener("click", async () => {
-      try {
-        if (!isPlaying) {
-          await bgAudio.play();
-          isPlaying = true;
-          playBtn.textContent = "Pause ❚❚";
-          // auto-unmute not performed to respect browser policies; user may toggle mute
-        } else {
-          bgAudio.pause();
-          isPlaying = false;
-          playBtn.textContent = "Play ▶";
-        }
-      } catch (err) {
-        // play might be blocked — switch to muted autoplay then instruct user
-        console.warn("Autoplay blocked; switching to muted autoplay", err);
-        bgAudio.muted = true;
-        await bgAudio.play().catch(()=>{});
+  // Try to progressively set src and load
+  let srcIndex = 0;
+  function setAudioSource(index){
+    if(index < 0 || index >= audioSources.length) return;
+    bgAudio.src = audioSources[index];
+    bgAudio.load();
+  }
+
+  // When the audio errors, try next fallback
+  bgAudio.addEventListener("error", () => {
+    console.warn("Audio error for source index", srcIndex, audioSources[srcIndex]);
+    srcIndex++;
+    if(srcIndex < audioSources.length){
+      setAudioSource(srcIndex);
+      // try to play muted first (bypassing autoplay block)
+      bgAudio.muted = true;
+      bgAudio.play().catch(()=>{});
+    } else {
+      // no more fallbacks
+      console.warn("All audio sources failed.");
+      trackTitle.textContent = "Audio unavailable";
+      trackArtist.textContent = "Try rehosting an MP3 if this persists.";
+    }
+  });
+
+  // Update progress bar as audio plays
+  bgAudio.addEventListener("timeupdate", ()=>{
+    if(!bgAudio.duration || isNaN(bgAudio.duration)) return;
+    const pct = (bgAudio.currentTime / bgAudio.duration) * 100;
+    progressBar.style.width = pct + "%";
+  });
+
+  // Default: set first source and start muted autoplay (so browsers allow play attempt)
+  setAudioSource(srcIndex);
+  bgAudio.muted = true;
+  bgAudio.volume = parseFloat(volumeSlider.value);
+
+  // Play / Pause
+  let isPlaying = false;
+  playBtn.addEventListener("click", async ()=>{
+    try {
+      if(!isPlaying){
+        await bgAudio.play();
         isPlaying = true;
         playBtn.textContent = "Pause ❚❚";
+        // if still muted, notify user to unmute
+        if(bgAudio.muted) muteBtn.textContent = "Muted";
+      } else {
+        bgAudio.pause();
+        isPlaying = false;
+        playBtn.textContent = "Play ▶";
       }
-    });
+    } catch(err){
+      console.warn("Play blocked; switching to muted playback.", err);
+      bgAudio.muted = true;
+      bgAudio.play().catch(()=>{});
+      isPlaying = true;
+      playBtn.textContent = "Pause ❚❚";
+    }
+  });
 
-    muteBtn.addEventListener("click", () => {
-      bgAudio.muted = !bgAudio.muted;
-      muteBtn.textContent = bgAudio.muted ? "Muted" : "Unmuted";
-    });
+  muteBtn.addEventListener("click", ()=>{
+    bgAudio.muted = !bgAudio.muted;
+    muteBtn.textContent = bgAudio.muted ? "Muted" : "Unmuted";
+  });
 
-    volumeSlider.addEventListener("input", () => {
-      bgAudio.volume = parseFloat(volumeSlider.value);
-      if (bgAudio.volume === 0) { bgAudio.muted = true; muteBtn.textContent = "Muted"; }
-      else { bgAudio.muted = false; muteBtn.textContent = "Unmuted"; }
-    });
+  volumeSlider.addEventListener("input", ()=>{
+    bgAudio.volume = parseFloat(volumeSlider.value);
+    if(bgAudio.volume === 0){ bgAudio.muted = true; muteBtn.textContent = "Muted"; }
+    else { bgAudio.muted = false; muteBtn.textContent = "Unmuted"; }
+  });
 
-    // Load server widget JSON
-    async function loadWidget(){
-      try {
-        const res = await fetch(WIDGET_JSON, {cache: "no-store"});
-        if (!res.ok) throw new Error("widget fetch failed: " + res.status);
-        const data = await res.json();
+  // Attempt to load the widget JSON first (preferred)
+  async function loadWidget(){
+    try {
+      const res = await fetch(WIDGET_JSON, {cache: "no-store"});
+      if(!res.ok) throw new Error("widget fetch failed: " + res.status);
+      const data = await res.json();
 
-        // server name/desc
-        serverName.textContent = data.name || "Chillverse";
-        serverDesc.textContent = data.instant_invite ? "Live — click Join to enter" : "Invite available";
+      serverNameEl.textContent = data.name || "Chillverse";
+      serverDescEl.textContent = data.instant_invite ? "Live — click Join" : "Invite available";
 
-        // online & member counts
-        const online = (typeof data.presence_count !== "undefined") ? data.presence_count : (data.members ? data.members.filter(m=>m.status!=="offline").length : "—");
-        const total = (typeof data.members !== "undefined") ? data.members.length : "—";
-        onlinePill.innerHTML = `● Online: ${online}`;
-        memberCount.textContent = `Members: ${total}`;
+      // presence_count (online) & members
+      const online = (typeof data.presence_count !== "undefined") ? data.presence_count : (Array.isArray(data.members) ? data.members.filter(m=>m.status && m.status !== "offline").length : "—");
+      const total = (Array.isArray(data.members) ? data.members.length : (typeof data.members_count !== "undefined" ? data.members_count : "—"));
 
-        // server icon: prefer widget's icon_url OR construct from icon hash
-        if (data.icon_url) {
-          serverIconImg.src = data.icon_url;
-        } else if (data.id && data.icon) {
-          serverIconImg.src = cdnIcon(data.id, data.icon);
-        } else {
-          // fallback (tiny svg)
-          serverIconImg.src = defaultIcon;
-        }
+      onlinePill.innerHTML = `● Online: ${online}`;
+      memberCount.textContent = `Members: ${total}`;
 
-        // small safety: if icon 404 or blocked, fallback to default
-        serverIconImg.onerror = ()=> serverIconImg.src = defaultIcon;
+      // icon_url preferred
+      if(data.icon_url){
+        serverIconImg.src = data.icon_url;
+      } else if(data.id && data.icon){
+        // construct CDN url from icon hash
+        serverIconImg.src = `https://cdn.discordapp.com/icons/${data.id}/${data.icon}.png?size=512`;
+      } else {
+        // fallback logic: try invite endpoint below
+        await tryInviteFallback();
+      }
 
-      } catch (err) {
-        console.warn("Could not load widget.json (CORS or disabled). Using best-effort fallback.", err);
-        serverName.textContent = "Chillverse";
-        serverDesc.textContent = "Invite: https://discord.gg/9C6VF4KFkV";
-        onlinePill.textContent = "● Online: —";
-        memberCount.textContent = "Members: —";
+      serverIconImg.onerror = ()=> serverIconImg.src = defaultIcon;
+    } catch(e){
+      console.warn("Widget JSON failed (CORS or disabled). Trying invite endpoint fallback.", e);
+      // try invite fallback
+      await tryInviteFallback();
+      serverNameEl.textContent = "Chillverse";
+      serverDescEl.textContent = "Invite: https://discord.gg/9C6VF4KFkV";
+      onlinePill.textContent = "● Online: —";
+      memberCount.textContent = "Members: —";
+    }
+  }
+
+  // Invite fallback: many invites return guild data including icon hash even if widget disabled
+  async function tryInviteFallback(){
+    try {
+      const r = await fetch(INVITE_API, {cache: "no-store"});
+      if(!r.ok) throw new Error("invite fetch failed: " + r.status);
+      const invite = await r.json();
+      if(invite.guild && invite.guild.icon){
+        serverIconImg.src = `https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}.png?size=512`;
+      } else {
         serverIconImg.src = defaultIcon;
       }
+    } catch(err){
+      console.warn("Invite fallback failed or blocked by CORS", err);
+      serverIconImg.src = defaultIcon;
     }
+  }
 
-    // initialize
-    loadWidget();
+  // initialize widget
+  loadWidget();
+  setInterval(loadWidget, 90000); // refresh online count every 90s
 
-    // refresh every 90s
-    setInterval(loadWidget, 90000);
-  })();
+  // friendly UX: if audio is available but user hasn't interacted, show hint in console
+  console.info("Widget initialized. Click Play to start audio and Unmute to hear it.");
+
+})();
 </script>
 </body>
 </html>
