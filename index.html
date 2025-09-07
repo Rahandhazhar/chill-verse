@@ -9,10 +9,10 @@
   :root{
     --accent:#7b86ff;
     --glass: rgba(255,255,255,0.03);
-    --card-radius:20px;
+    --card-radius:18px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#eaf0ff}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#eef3ff}
   body{
     background:
       linear-gradient(180deg, rgba(6,8,12,0.6), rgba(8,10,12,0.8)),
@@ -26,12 +26,13 @@
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
   }
+
   .wrap{width:460px;max-width:calc(100% - 40px);position:relative;z-index:3}
   .card{
     border-radius:var(--card-radius);
     overflow:hidden;
-    background:linear-gradient(180deg, rgba(12,14,17,0.6), rgba(8,9,11,0.5));
-    padding:18px;border:1px solid rgba(255,255,255,0.025);
+    background:linear-gradient(180deg, rgba(12,14,17,0.62), rgba(8,9,11,0.52));
+    padding:18px;border:1px solid rgba(255,255,255,0.02);
     box-shadow:0 18px 60px rgba(2,6,12,0.7);
     backdrop-filter: blur(10px) saturate(1.02);
   }
@@ -72,7 +73,12 @@
   .progress{height:6px;background:rgba(255,255,255,0.04);border-radius:6px;margin-top:12px;overflow:hidden}
   .progress > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#4fb0ff)}
 
-  .note{font-size:12px;margin-top:14px;color:rgba(234,240,255,0.6);text-align:center}
+  .status-msg{margin-top:10px;font-size:13px;color:rgba(234,240,255,0.7)}
+  .upload-row{display:flex;gap:8px;align-items:center;margin-top:10px}
+
+  input[type=file]{display:none}
+  .upload-btn{background:transparent;border:1px dashed rgba(255,255,255,0.08);padding:8px 12px;border-radius:10px;color:rgba(234,240,255,0.85);cursor:pointer}
+  .upload-btn:hover{border-color:rgba(123,134,255,0.18)}
 
   @media (max-width:520px){
     .wrap{width:100%}
@@ -82,7 +88,7 @@
 </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap" id="wrap">
     <div class="card" role="region" aria-label="Chillverse server widget">
       <div class="header">
         <div class="server-icon" id="serverIconWrap"><img id="serverIcon" src="" alt="server icon"></div>
@@ -121,23 +127,26 @@
           <div class="progress" title="progress">
             <i id="progressBar"></i>
           </div>
-        </div>
-      </div>
 
-      <div class="note" id="footerNote">
-        Music: royalty-free (Mixkit/Pixabay fallback). If audio is blocked by browser, press Play and then Unmute. If the server icon doesn't load, widget or server icon may be disabled — the widget tries extra fallbacks automatically. :contentReference[oaicite:2]{index=2}
+          <div class="status-msg" id="statusMsg">Initializing audio...</div>
+
+          <div class="upload-row" style="display:none" id="uploadRow">
+            <label class="upload-btn" id="uploadLabel" for="uploadInput">Upload audio (MP3/OGG)</label>
+            <input type="file" id="uploadInput" accept="audio/*">
+            <button class="btn" id="clearUpload" style="display:none">Clear</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Audio element (we add fallback URLs via JS and listen for errors) -->
+  <!-- audio element -->
   <audio id="bgAudio" loop crossorigin="anonymous" preload="auto"></audio>
 
 <script>
 (function(){
   const GUILD_ID = "1413927989481308192";
   const WIDGET_JSON = `https://discord.com/api/guilds/${GUILD_ID}/widget.json`;
-  // invite code from provided invite link (user-provided)
   const INVITE_CODE = "9C6VF4KFkV";
   const INVITE_API = `https://discord.com/api/v10/invites/${INVITE_CODE}?with_counts=true&with_expiration=true`;
 
@@ -157,80 +166,107 @@
   const trackTitle = document.getElementById("trackTitle");
   const trackArtist = document.getElementById("trackArtist");
   const progressBar = document.getElementById("progressBar");
+  const statusMsg = document.getElementById("statusMsg");
+  const uploadRow = document.getElementById("uploadRow");
+  const uploadInput = document.getElementById("uploadInput");
+  const clearUpload = document.getElementById("clearUpload");
+  const uploadLabel = document.getElementById("uploadLabel");
 
-  // Audio sources (try in order). Replace or add your own hosted MP3 if you have one.
-  // 1) Mixkit preview (may be blocked sometimes) - good royalty-free option.
-  // 2) File-Examples fallback (stable public sample file).
-  // You can replace either URL with a hosted MP3 that you control for guaranteed reliability.
+  // audio sources to try (ordered). Keep a local upload option if these fail.
   const audioSources = [
-    "https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3", // Mixkit (nice calm)
-    "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3" // public fallback
+    "https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3",
+    "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3"
   ];
 
-  // Try to progressively set src and load
   let srcIndex = 0;
-  function setAudioSource(index){
+  let isPlaying = false;
+  let usingLocalFile = false;
+
+  function setSource(index){
     if(index < 0 || index >= audioSources.length) return;
     bgAudio.src = audioSources[index];
-    bgAudio.load();
+    try { bgAudio.load(); } catch(e) {}
+    statusMsg.textContent = `Trying audio source ${index+1} of ${audioSources.length}...`;
   }
 
-  // When the audio errors, try next fallback
-  bgAudio.addEventListener("error", () => {
-    console.warn("Audio error for source index", srcIndex, audioSources[srcIndex]);
+  // initial attempt: set first source and attempt muted autoplay
+  setSource(srcIndex);
+  bgAudio.muted = true;
+  bgAudio.volume = parseFloat(volumeSlider.value);
+
+  // try to play muted to warm up the audio without user interaction
+  bgAudio.play().then(()=> {
+    statusMsg.textContent = "Muted playback started (click Play to hear).";
+    isPlaying = true;
+    playBtn.textContent = "Pause ❚❚";
+  }).catch(()=> {
+    // autoplay blocked or source CORS blocked; still attempt to load
+    statusMsg.textContent = "Autoplay blocked or remote blocked. Click Play. If audio fails, upload your own file.";
+  });
+
+  // on error -> try next source
+  bgAudio.addEventListener("error", ()=>{
+    console.warn("Audio error for source", srcIndex, bgAudio.currentSrc);
     srcIndex++;
     if(srcIndex < audioSources.length){
-      setAudioSource(srcIndex);
-      // try to play muted first (bypassing autoplay block)
+      setSource(srcIndex);
+      // try muted play again
       bgAudio.muted = true;
       bgAudio.play().catch(()=>{});
     } else {
-      // no more fallbacks
-      console.warn("All audio sources failed.");
-      trackTitle.textContent = "Audio unavailable";
-      trackArtist.textContent = "Try rehosting an MP3 if this persists.";
+      // all remote sources failed — offer upload
+      statusMsg.textContent = "Audio unavailable from hosted sources. You can upload a local audio file to play.";
+      uploadRow.style.display = "flex";
+      trackTitle.textContent = "No remote audio";
+      trackArtist.textContent = "";
     }
   });
 
-  // Update progress bar as audio plays
+  // progress update
   bgAudio.addEventListener("timeupdate", ()=>{
     if(!bgAudio.duration || isNaN(bgAudio.duration)) return;
     const pct = (bgAudio.currentTime / bgAudio.duration) * 100;
     progressBar.style.width = pct + "%";
   });
 
-  // Default: set first source and start muted autoplay (so browsers allow play attempt)
-  setAudioSource(srcIndex);
-  bgAudio.muted = true;
-  bgAudio.volume = parseFloat(volumeSlider.value);
-
-  // Play / Pause
-  let isPlaying = false;
-  playBtn.addEventListener("click", async ()=>{
-    try {
-      if(!isPlaying){
-        await bgAudio.play();
-        isPlaying = true;
-        playBtn.textContent = "Pause ❚❚";
-        // if still muted, notify user to unmute
-        if(bgAudio.muted) muteBtn.textContent = "Muted";
-      } else {
-        bgAudio.pause();
-        isPlaying = false;
-        playBtn.textContent = "Play ▶";
-      }
-    } catch(err){
-      console.warn("Play blocked; switching to muted playback.", err);
-      bgAudio.muted = true;
-      bgAudio.play().catch(()=>{});
-      isPlaying = true;
-      playBtn.textContent = "Pause ❚❚";
+  // when metadata loads, show track length if possible
+  bgAudio.addEventListener("loadedmetadata", ()=>{
+    if(!usingLocalFile){
+      trackTitle.textContent = "Serene Mix";
+      trackArtist.textContent = "Calm ambient — remote";
+      statusMsg.textContent = bgAudio.muted ? "Loaded (muted). Click Play then Unmute." : "Loaded — playing.";
+    } else {
+      statusMsg.textContent = "Local audio loaded — click Play to listen.";
     }
   });
 
+  // play/pause button
+  playBtn.addEventListener("click", async ()=>{
+    if(!isPlaying){
+      try {
+        await bgAudio.play();
+        isPlaying = true;
+        playBtn.textContent = "Pause ❚❚";
+        statusMsg.textContent = bgAudio.muted ? "Playing (muted). Unmute to hear." : "Playing";
+      } catch(err){
+        console.warn("Play blocked", err);
+        statusMsg.textContent = "Playback blocked by browser — try clicking Unmute or upload a file.";
+        // allow user to interact: show upload
+        uploadRow.style.display = "flex";
+      }
+    } else {
+      bgAudio.pause();
+      isPlaying = false;
+      playBtn.textContent = "Play ▶";
+      statusMsg.textContent = "Paused";
+    }
+  });
+
+  // mute button
   muteBtn.addEventListener("click", ()=>{
     bgAudio.muted = !bgAudio.muted;
     muteBtn.textContent = bgAudio.muted ? "Muted" : "Unmuted";
+    statusMsg.textContent = bgAudio.muted ? "Muted" : "Unmuted";
   });
 
   volumeSlider.addEventListener("input", ()=>{
@@ -239,47 +275,43 @@
     else { bgAudio.muted = false; muteBtn.textContent = "Unmuted"; }
   });
 
-  // Attempt to load the widget JSON first (preferred)
-  async function loadWidget(){
-    try {
-      const res = await fetch(WIDGET_JSON, {cache: "no-store"});
-      if(!res.ok) throw new Error("widget fetch failed: " + res.status);
-      const data = await res.json();
-
-      serverNameEl.textContent = data.name || "Chillverse";
-      serverDescEl.textContent = data.instant_invite ? "Live — click Join" : "Invite available";
-
-      // presence_count (online) & members
-      const online = (typeof data.presence_count !== "undefined") ? data.presence_count : (Array.isArray(data.members) ? data.members.filter(m=>m.status && m.status !== "offline").length : "—");
-      const total = (Array.isArray(data.members) ? data.members.length : (typeof data.members_count !== "undefined" ? data.members_count : "—"));
-
-      onlinePill.innerHTML = `● Online: ${online}`;
-      memberCount.textContent = `Members: ${total}`;
-
-      // icon_url preferred
-      if(data.icon_url){
-        serverIconImg.src = data.icon_url;
-      } else if(data.id && data.icon){
-        // construct CDN url from icon hash
-        serverIconImg.src = `https://cdn.discordapp.com/icons/${data.id}/${data.icon}.png?size=512`;
-      } else {
-        // fallback logic: try invite endpoint below
-        await tryInviteFallback();
-      }
-
-      serverIconImg.onerror = ()=> serverIconImg.src = defaultIcon;
-    } catch(e){
-      console.warn("Widget JSON failed (CORS or disabled). Trying invite endpoint fallback.", e);
-      // try invite fallback
-      await tryInviteFallback();
-      serverNameEl.textContent = "Chillverse";
-      serverDescEl.textContent = "Invite: https://discord.gg/9C6VF4KFkV";
-      onlinePill.textContent = "● Online: —";
-      memberCount.textContent = "Members: —";
+  // Upload local file: plays in-place and overrides remote sources for the session
+  uploadInput.addEventListener("change", (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    if(!file.type.startsWith("audio/")){
+      statusMsg.textContent = "Please upload a valid audio file (mp3/ogg/wav).";
+      return;
     }
-  }
+    usingLocalFile = true;
+    const objectUrl = URL.createObjectURL(file);
+    bgAudio.src = objectUrl;
+    bgAudio.load();
+    bgAudio.muted = false;
+    bgAudio.play().catch(()=>{});
+    trackTitle.textContent = file.name;
+    trackArtist.textContent = "Local file";
+    statusMsg.textContent = "Local audio loaded — playing.";
+    clearUpload.style.display = "inline-block";
+  });
 
-  // Invite fallback: many invites return guild data including icon hash even if widget disabled
+  clearUpload.addEventListener("click", ()=>{
+    // clear local file and revert to remote source attempts
+    usingLocalFile = false;
+    uploadInput.value = "";
+    clearUpload.style.display = "none";
+    srcIndex = 0;
+    setSource(srcIndex);
+    bgAudio.load();
+    bgAudio.muted = true;
+    bgAudio.play().catch(()=>{});
+    trackTitle.textContent = "Serene Mix";
+    trackArtist.textContent = "Calm ambient — remote";
+    statusMsg.textContent = "Reverted to remote sources. Click Play.";
+    uploadRow.style.display = "none";
+  });
+
+  // PFP + widget JSON loading (same robust fallbacks)
   async function tryInviteFallback(){
     try {
       const r = await fetch(INVITE_API, {cache: "no-store"});
@@ -291,18 +323,47 @@
         serverIconImg.src = defaultIcon;
       }
     } catch(err){
-      console.warn("Invite fallback failed or blocked by CORS", err);
+      console.warn("Invite fallback failed", err);
       serverIconImg.src = defaultIcon;
     }
   }
 
-  // initialize widget
+  async function loadWidget(){
+    try {
+      const res = await fetch(WIDGET_JSON, {cache: "no-store"});
+      if(!res.ok) throw new Error("widget fetch failed: " + res.status);
+      const data = await res.json();
+
+      serverNameEl.textContent = data.name || "Chillverse";
+      serverDescEl.textContent = data.instant_invite ? "Live — click Join" : "Invite available";
+
+      const online = (typeof data.presence_count !== "undefined") ? data.presence_count : (Array.isArray(data.members) ? data.members.filter(m=>m.status && m.status !== "offline").length : "—");
+      const total = (Array.isArray(data.members) ? data.members.length : (typeof data.members_count !== "undefined" ? data.members_count : "—"));
+
+      onlinePill.innerHTML = `● Online: ${online}`;
+      memberCount.textContent = `Members: ${total}`;
+
+      if(data.icon_url){
+        serverIconImg.src = data.icon_url;
+      } else if(data.id && data.icon){
+        serverIconImg.src = `https://cdn.discordapp.com/icons/${data.id}/${data.icon}.png?size=512`;
+      } else {
+        await tryInviteFallback();
+      }
+      serverIconImg.onerror = ()=> serverIconImg.src = defaultIcon;
+    } catch(e){
+      console.warn("Widget JSON failed; trying invite fallback", e);
+      await tryInviteFallback();
+      serverNameEl.textContent = "Chillverse";
+      serverDescEl.textContent = "Invite: https://discord.gg/9C6VF4KFkV";
+      onlinePill.textContent = "● Online: —";
+      memberCount.textContent = "Members: —";
+    }
+  }
+
+  // initialize
   loadWidget();
-  setInterval(loadWidget, 90000); // refresh online count every 90s
-
-  // friendly UX: if audio is available but user hasn't interacted, show hint in console
-  console.info("Widget initialized. Click Play to start audio and Unmute to hear it.");
-
+  setInterval(loadWidget, 90000);
 })();
 </script>
 </body>
