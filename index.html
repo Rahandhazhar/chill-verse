@@ -21,23 +21,20 @@
   html,body{height:100%;margin:0}
   body{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--bg-0),var(--bg-1));font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#fff;padding:28px}
 
-  /* container */
   .stage{width:var(--size);max-width:94vw;position:relative}
   canvas{position:absolute;inset:6px;border-radius:calc(var(--radius) - 4px);pointer-events:none;z-index:0}
 
-  /* layered glass cards for depth */
   .layer{position:absolute;inset:6px;border-radius:var(--radius);z-index:0;pointer-events:none}
   .layer.l1{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));filter:blur(6px);opacity:0.45}
   .layer.l2{inset:10px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0));opacity:0.28}
 
-  /* main card */
-  .card{position:relative;z-index:2;border-radius:var(--radius);overflow:hidden;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,0.65), 0 0 40px rgba(127,0,255,0.08);border:1px solid rgba(255,255,255,0.03);transition:transform .18s ease}
+  .card{position:relative;z-index:3;border-radius:var(--radius);overflow:hidden;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,0.65), 0 0 40px rgba(127,0,255,0.08);border:1px solid rgba(255,255,255,0.03);transition:transform .18s ease}
 
   .row{display:flex;align-items:center;gap:12px}
   .pfp-wrap{width:92px;height:92px;flex-shrink:0;position:relative}
-  .pfp{width:92px;height:92px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,221,0,0.85);box-shadow:0 6px 26px rgba(0,0,0,0.55);background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+  .pfp{width:92px;height:92px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,221,0,0.85);box-shadow:0 6px 26px rgba(0,0,0,0.55);background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);transition:transform .28s cubic-bezier(.2,.9,.2,1), filter .18s ease}
   .pfp img{width:100%;height:100%;object-fit:cover;display:block}
-  .ring-svg{position:absolute;inset:0;width:92px;height:92px;pointer-events:none;transform:translateZ(0)}
+  .ring-svg{position:absolute;inset:0;width:92px;height:92px;pointer-events:none;transform:translateZ(0);transition:filter .25s ease, transform .25s ease}
 
   .title{flex:1}
   .title h1{font-size:20px;margin:0;color:var(--gold);text-shadow:0 0 10px rgba(255,213,79,0.07);letter-spacing:0.2px}
@@ -46,12 +43,10 @@
   .meta{display:flex;align-items:center;gap:12px;margin-top:14px}
   .status{display:flex;align-items:center;gap:10px;background:var(--glass);padding:10px;border-radius:12px;box-shadow:inset 0 -6px 18px rgba(0,0,0,0.36)}
   .status .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--accent-1),var(--accent-3));box-shadow:0 0 10px rgba(127,0,255,0.18)}
-  #online-count{font-weight:700;color:#fff}
+  #online-count{font-weight:700;color:#fff;min-width:96px}
 
-  /* sparkline */
   .spark{width:160px;height:44px;border-radius:8px}
 
-  /* big call-to-action */
   .cta{margin-left:auto;display:flex;gap:8px;align-items:center}
   .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;font-weight:700;border:none;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,0.45), 0 6px 18px rgba(127,0,255,0.08)}
   .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);font-weight:600;color:var(--muted)}
@@ -59,18 +54,14 @@
   .meta-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
   .muted{color:var(--muted);font-size:12px}
 
-  /* little animations */
-  @keyframes subtleFloat{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
-  .pfp{transition:transform .28s cubic-bezier(.2,.9,.2,1), filter .18s ease}
+  .loading-overlay{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.5));backdrop-filter:blur(6px);border-radius:var(--radius);}
+  .loader{width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .loader:after{content:'';width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,0.08);border-top-color:var(--accent-1);animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* focus states */
-  .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
+  .error-banner{position:relative;margin-top:10px;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,#3b0b70,#7f004d);color:#fff;font-size:13px;display:none}
 
-  /* responsive */
   @media(max-width:420px){:root{--size:92vw}.pfp{width:74px;height:74px}.ring-svg{width:74px;height:74px}.title h1{font-size:18px}}
-
-  /* reduced motion */
-  @media (prefers-reduced-motion: reduce){ .pfp{transition:none} }
 </style>
 </head>
 <body>
@@ -82,6 +73,10 @@
     <canvas id="burst"></canvas>
 
     <div class="card" id="card" role="region" aria-label="Chillverse widget">
+      <div class="loading-overlay" id="loading">
+        <div class="loader" aria-hidden="true"></div>
+      </div>
+
       <div class="row">
         <div class="pfp-wrap">
           <div class="pfp"><img src="pfp.jfif" alt="Chillverse"></div>
@@ -99,7 +94,7 @@
 
         <div class="title">
           <h1>✨═━☆ Chillverse ☆━═✨</h1>
-          <p>Vibe lounge for chats, music & friendly hangs — pop in and say hello.</p>
+          <p id="desc">Vibe lounge for chats, music & friendly hangs — pop in and say hello.</p>
         </div>
 
         <div style="margin-left:10px;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
@@ -130,6 +125,7 @@
           <button id="copyBtn" class="btn ghost" aria-label="Copy invite">Copy</button>
         </div>
       </div>
+      <div class="error-banner" id="errorBanner">Couldn't load live data — showing demo values.</div>
     </div>
   </div>
 
@@ -144,106 +140,160 @@
     </div>
   </div>
 
-  <!-- QR lib -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
   <script>
-  // Config
-  const serverID = '1413927989481308192';
-  const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
-  const fallbackInvite = 'https://discord.gg/YOUR_INVITE_HERE';
-  const tempInviteEndpoint = '/api/generate-invite'; // optional server endpoint
+  document.addEventListener('DOMContentLoaded', () => {
+    // Config
+    const serverID = '1413927989481308192';
+    const apiURL = `https://discord.com/api/guilds/${serverID}/widget.json`;
+    const fallbackInvite = 'https://discord.gg/YOUR_INVITE_HERE';
+    const tempInviteEndpoint = null; // disable by default for easier testing
 
-  // DOM
-  const stage = document.getElementById('stage');
-  const starCan = document.getElementById('starfield');
-  const burstCan = document.getElementById('burst');
-  const sparkCan = document.getElementById('sparkline');
-  const onlineEl = document.getElementById('online-count');
-  const updatedEl = document.getElementById('updatedAt');
-  const ring = document.getElementById('ring');
-  const inviteBtn = document.getElementById('inviteBtn');
-  const qrBtn = document.getElementById('qrBtn');
-  const copyBtn = document.getElementById('copyBtn');
-  const qrModal = document.getElementById('qrModal');
-  const qrcodeWrap = document.getElementById('qrcode');
+    // DOM
+    const stage = document.getElementById('stage');
+    const starCan = document.getElementById('starfield');
+    const burstCan = document.getElementById('burst');
+    const sparkCan = document.getElementById('sparkline');
+    const onlineEl = document.getElementById('online-count');
+    const updatedEl = document.getElementById('updatedAt');
+    const ring = document.getElementById('ring');
+    const inviteBtn = document.getElementById('inviteBtn');
+    const qrBtn = document.getElementById('qrBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const qrModal = document.getElementById('qrModal');
+    const qrcodeWrap = document.getElementById('qrcode');
+    const loading = document.getElementById('loading');
+    const errorBanner = document.getElementById('errorBanner');
 
-  // State
-  let currentInvite = fallbackInvite;
-  let history = loadHistory();
-  const HISTORY_LEN = 30;
-  const cacheKey = 'chill.cache.v3';
+    // state
+    let currentInvite = fallbackInvite;
+    let history = loadHistory();
+    const HISTORY_LEN = 30;
+    const cacheKey = 'chill.cache.v4';
 
-  function now(){return Date.now();}
+    function now(){ return Date.now(); }
+    function loadHistory(){ try{ const h = JSON.parse(localStorage.getItem('chill.history')||'null'); if(Array.isArray(h)) return h.slice(-HISTORY_LEN); }catch(e){} return Array(HISTORY_LEN).fill(0); }
+    function saveHistory(){ try{ localStorage.setItem('chill.history', JSON.stringify(history)); }catch(e){} }
 
-  function loadHistory(){try{const h = JSON.parse(localStorage.getItem('chill.history')||'null'); if(Array.isArray(h)) return h.slice(-HISTORY_LEN); }catch(e){} return Array(HISTORY_LEN).fill(0);} 
-  function saveHistory(){try{localStorage.setItem('chill.history', JSON.stringify(history));}catch(e){}}
+    // safe DOM helper
+    function safeText(el, text){ if(!el) return; el.textContent = text; }
 
-  // Fetch widget with simple caching
-  async function fetchWidget(){
-    try{ const c = JSON.parse(localStorage.getItem(cacheKey)||'null'); if(c && now()-c.t < 30000){ apply(c.data, true); } }
-    catch(e){}
-    try{
-      const res = await fetch(apiURL,{cache:'no-store'}); if(!res.ok) throw new Error('fetch'); const data = await res.json(); localStorage.setItem(cacheKey, JSON.stringify({t:now(),data})); apply(data);
-    }catch(e){ console.warn('widget fetch failed',e); onlineEl.textContent = 'Unavailable'; updatedEl.textContent = new Date().toLocaleString(); inviteBtn.onclick = ()=>window.open(fallbackInvite,'_blank'); }
-  }
+    // robust fetch with fallback to demo values
+    async function fetchWidget(){
+      showLoading(true);
+      hideError();
+      // try cached
+      try{ const c = JSON.parse(localStorage.getItem(cacheKey)||'null'); if(c && now()-c.t < 30000){ apply(c.data, true); showLoading(false); } } catch(e){}
 
-  function apply(data, fromCache){ const count = (data && data.presence_count) || 0; const prev = history[history.length-1]||0; history.push(count); if(history.length>HISTORY_LEN) history.shift(); saveHistory(); drawSpark(history);
-    if(count>prev){ burst(count-prev); pulseRing(); }
-    onlineEl.textContent = `🟢 ${count} online`;
-    updatedEl.textContent = new Date().toLocaleString(); currentInvite = data.instant_invite || currentInvite; inviteBtn.onclick = ()=>window.open(currentInvite,'_blank'); }
+      try{
+        const res = await fetch(apiURL, {cache:'no-store'});
+        if(!res.ok) throw new Error('bad-response');
+        const data = await res.json();
+        localStorage.setItem(cacheKey, JSON.stringify({t:now(), data}));
+        apply(data);
+        showLoading(false);
+      }catch(err){
+        console.warn('live fetch failed', err);
+        // fallback: show demo/static data but keep UI interactive
+        applyDemo();
+        showLoading(false);
+        showError('Could not load live data — showing demo values.');
+      }
+    }
 
-  fetchWidget(); setInterval(fetchWidget,15000);
+    function apply(data, fromCache=false){
+      try{
+        const count = (data && data.presence_count) || 0;
+        const prev = history[history.length-1] || 0;
+        history.push(count); if(history.length>HISTORY_LEN) history.shift(); saveHistory();
+        drawSpark(history);
+        if(count > prev){ burst(count-prev); pulseRing(); }
+        safeText(onlineEl, `🟢 ${count} online`);
+        safeText(updatedEl, new Date().toLocaleString());
+        currentInvite = data.instant_invite || currentInvite;
+        inviteBtn.onclick = ()=> window.open(currentInvite, '_blank');
+        // ring
+        const maxGuess = Math.max(50, ...history, 100);
+        const pct = Math.min(count / maxGuess, 1);
+        setRing(pct);
+      }catch(e){ console.error('apply err', e); }
+    }
 
-  // Sparkline
-  const sctx = sparkCan.getContext('2d');
-  function drawSpark(vals){ const W = 160, H = 44; sparkCan.width = W*devicePixelRatio; sparkCan.height = H*devicePixelRatio; sparkCan.style.width = W+'px'; sparkCan.style.height = H+'px'; sctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); sctx.clearRect(0,0,W,H);
-    const max = Math.max(5, ...vals); const min = Math.min(...vals); const pad = 6; const step = (W - pad*2)/(vals.length-1 ||1);
-    sctx.beginPath(); for(let i=0;i<vals.length;i++){ const x = pad + i*step; const y = H - pad - ((vals[i]-min)/(Math.max(1,max-min)))*(H - pad*2||1); if(i===0) sctx.moveTo(x,y); else sctx.lineTo(x,y);} sctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-1')||'#7f00ff'; sctx.lineWidth = 2; sctx.stroke(); const g = sctx.createLinearGradient(0,0,0,H); g.addColorStop(0,(getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#ff4bd6')+'33'); g.addColorStop(1,'transparent'); sctx.lineTo(pad+(vals.length-1)*step,H-pad); sctx.lineTo(pad,H-pad); sctx.fillStyle = g; sctx.fill(); }
+    function applyDemo(){ const demo = {presence_count: Math.floor(Math.random()*120)+8, instant_invite: fallbackInvite}; apply(demo); }
 
-  // Ring control
-  function setRing(pct){ const circle = ring; const total = 2*Math.PI*44; const dash = total; const off = dash*(1-pct); circle.setAttribute('stroke-dasharray',dash); circle.setAttribute('stroke-dashoffset',off); circle.style.filter = `drop-shadow(0 0 ${4 + pct*12}px rgba(127,0,255,0.16))`; }
-  function pulseRing(){ ring.style.transition='transform .48s cubic-bezier(.2,.9,.3,1)'; ring.style.transform='scale(1.08)'; setTimeout(()=>{ ring.style.transform=''; ring.style.transition=''; },480); }
+    function showLoading(v){ loading.style.display = v ? 'flex' : 'none'; }
+    function showError(msg){ errorBanner.textContent = msg; errorBanner.style.display = 'block'; }
+    function hideError(){ errorBanner.style.display = 'none'; }
 
-  // Burst system
-  const burstCtx = burstCan.getContext('2d'); let burstParticles=[]; function burst(amount){ spawnBurst(20 + amount*4); }
-  function spawnBurst(n){ const rect = stage.getBoundingClientRect(); const cx = rect.left + rect.width*0.14; const cy = rect.top + rect.height*0.18; const x = (cx - rect.left); const y = (cy - rect.top); burstCan.width = burstCan.offsetWidth*devicePixelRatio; burstCan.height = burstCan.offsetHeight*devicePixelRatio; burstCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2; const sp=1.6+Math.random()*3; burstParticles.push({x:x + (Math.random()-0.5)*6, y:y + (Math.random()-0.5)*6, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:50+Math.random()*40, r:1+Math.random()*2, hue:250+Math.random()*100}); }
-    if(!burstRunning){ burstRunning=true; requestAnimationFrame(burstLoop); } }
-  let burstRunning=false; function burstLoop(){ burstCtx.clearRect(0,0,burstCan.width,burstCan.height); for(let i=burstParticles.length-1;i>=0;i--){ const p=burstParticles[i]; p.x+=p.vx; p.y+=p.vy; p.vx*=0.96; p.vy*=0.96; p.life-=1; const a=Math.max(0,p.life/90); burstCtx.beginPath(); burstCtx.fillStyle=`hsla(${p.hue},80%,60%,${a})`; burstCtx.arc(p.x,p.y,p.r,0,Math.PI*2); burstCtx.fill(); if(p.life<=0) burstParticles.splice(i,1); } if(burstParticles.length>0) requestAnimationFrame(burstLoop); else{ burstRunning=false; burstCtx.clearRect(0,0,burstCan.width,burstCan.height); } }
+    // sparkline drawing
+    const sctx = sparkCan.getContext('2d');
+    function drawSpark(vals){ try{ const W=160, H=44; sparkCan.width = W*devicePixelRatio; sparkCan.height = H*devicePixelRatio; sparkCan.style.width = W+'px'; sparkCan.style.height = H+'px'; sctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); sctx.clearRect(0,0,W,H);
+        const max = Math.max(5, ...vals); const min = Math.min(...vals); const pad = 6; const step = (W - pad*2) / (vals.length - 1 || 1);
+        sctx.beginPath(); for(let i=0;i<vals.length;i++){ const x = pad + i*step; const y = H - pad - ((vals[i]-min) / Math.max(1, max-min)) * (H - pad*2 || 1); if(i===0) sctx.moveTo(x,y); else sctx.lineTo(x,y); }
+        sctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-1') || '#7f00ff'; sctx.lineWidth = 2; sctx.stroke(); sctx.lineTo(pad + (vals.length-1)*step, H - pad); sctx.lineTo(pad, H - pad); sctx.closePath(); const g = sctx.createLinearGradient(0,0,0,H); g.addColorStop(0, (getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#ff4bd6') + '33'); g.addColorStop(1, 'transparent'); sctx.fillStyle = g; sctx.fill(); }catch(e){console.warn('spark draw',e);} }
 
-  // Starfield + hover repulse + micro-parallax
-  (function(){ const can=starCan; const ctx=can.getContext('2d'); function resize(){ can.width = can.offsetWidth*devicePixelRatio; can.height = can.offsetHeight*devicePixelRatio; can.style.width = can.offsetWidth+'px'; can.style.height = can.offsetHeight+'px'; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); burstCan.width = burstCan.offsetWidth*devicePixelRatio; burstCan.height = burstCan.offsetHeight*devicePixelRatio; burstCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
-    resize(); window.addEventListener('resize', resize);
-    const PART=50; const stars=[]; function R(a,b){return Math.random()*(b-a)+a}
-    for(let i=0;i<PART;i++) stars.push({x:R(0,can.offsetWidth), y:R(0,can.offsetHeight), r:R(0.3,1.6), vx:R(-0.03,0.03), vy:R(0.02,0.22), bx:R(-0.03,0.03), by:R(0.02,0.22)});
-    let mouse={x:-9999,y:-9999,active:false}; stage.addEventListener('mousemove',e=>{ const r=stage.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; }); stage.addEventListener('mouseenter',()=>mouse.active=true); stage.addEventListener('mouseleave',()=>{mouse.active=false;mouse.x=-9999;mouse.y=-9999});
-    const layers = document.querySelectorAll('.layer'); function parallax(){ const r=stage.getBoundingClientRect(); const cx=r.width/2, cy=r.height/2; const mx = mouse.x===-9999?cx:mouse.x; const my = mouse.y===-9999?cy:mouse.y; const rx=(mx-cx)/cx; const ry=(my-cy)/cy; layers.forEach((el,i)=>{ const depth=(i+1)/14; el.style.transform=`translate3d(${-rx*depth*10}px, ${-ry*depth*8}px, 0) scale(${1 - i*0.002})`; }); }
-    let last=0; function draw(t){ if(t-last<30){ requestAnimationFrame(draw); return;} last=t; ctx.clearRect(0,0,can.width,can.height); ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,0,can.offsetWidth,can.offsetHeight);
-      for(const s of stars){ s.x+=s.vx; s.y+=s.vy; if(mouse.active){ const dx=s.x-mouse.x, dy=s.y-mouse.y; const d2=dx*dx+dy*dy; const R0=80; if(d2<R0*R0){ const f=(1-(Math.sqrt(d2)/R0)); s.vx += (dx/d2)*f*0.8; s.vy += (dy/d2)*f*0.8 } }
-        s.vx*=0.985; s.vy = s.vy*0.985 + s.by*0.015; if(s.y>can.offsetHeight+6){ s.y=-6; s.x=Math.random()*can.offsetWidth } if(s.x<-10) s.x=can.offsetWidth+10; if(s.x>can.offsetWidth+10) s.x=-10; const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*6); g.addColorStop(0,`rgba(255,255,255,${0.85*(s.r/1.6)})`); g.addColorStop(0.6,'rgba(255,255,255,0.12)'); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); }
-      parallax(); requestAnimationFrame(draw); }
-    draw(0);
-  })();
+    // ring
+    function setRing(pct){ try{ const circle = ring; const total = 2*Math.PI*44; const dash = total; const off = dash * (1 - pct); circle.setAttribute('stroke-dasharray', dash); circle.setAttribute('stroke-dashoffset', off); circle.style.filter = `drop-shadow(0 0 ${4 + pct*12}px rgba(127,0,255,0.16))`; }catch(e){} }
+    function pulseRing(){ try{ ring.style.transition='transform .48s cubic-bezier(.2,.9,.3,1)'; ring.style.transform='scale(1.08)'; setTimeout(()=>{ ring.style.transform=''; ring.style.transition=''; },480); }catch(e){} }
 
-  // QR modal and temp invite
-  qrBtn.addEventListener('click', async ()=>{ const t = await fetchTempInvite(); if(t && t.invite){ currentInvite=t.invite; } openQr(); });
-  function openQr(){ qrModal.style.display='flex'; qrcodeWrap.innerHTML=''; new QRCode(qrcodeWrap,{text:currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'}); }
-  document.getElementById('closeQr').addEventListener('click', ()=>{ qrModal.style.display='none'; qrcodeWrap.innerHTML=''; });
+    // burst
+    const bctx = burstCan.getContext('2d'); let bparts = [];
+    function burst(amount){ spawnBurst(12 + Math.min(40, amount*4)); }
+    function spawnBurst(n){ try{ const rect = stage.getBoundingClientRect(); const cx = rect.width * 0.14; const cy = rect.height * 0.18; burstCan.width = burstCan.offsetWidth * devicePixelRatio; burstCan.height = burstCan.offsetHeight * devicePixelRatio; bctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+          for(let i=0;i<n;i++){ const a = Math.random()*Math.PI*2; const sp = 1.6 + Math.random()*3; bparts.push({x:cx + (Math.random()-0.5)*6, y:cy + (Math.random()-0.5)*6, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:50+Math.random()*40, r:1+Math.random()*2, hue:250+Math.random()*100}); }
+          if(!bRunning){ bRunning=true; requestAnimationFrame(bLoop); } }catch(e){console.warn('spawnBurst',e);} }
+    let bRunning=false; function bLoop(){ bctx.clearRect(0,0,burstCan.width,burstCan.height); for(let i=bparts.length-1;i>=0;i--){ const p=bparts[i]; p.x+=p.vx; p.y+=p.vy; p.vx*=0.96; p.vy*=0.96; p.life-=1; const a=Math.max(0,p.life/90); bctx.beginPath(); bctx.fillStyle=`hsla(${p.hue},80%,60%,${a})`; bctx.arc(p.x,p.y,p.r,0,Math.PI*2); bctx.fill(); if(p.life<=0) bparts.splice(i,1); } if(bparts.length>0) requestAnimationFrame(bLoop); else{ bRunning=false; bctx.clearRect(0,0,burstCan.width,burstCan.height); } }
 
-  async function fetchTempInvite(){ if(!tempInviteEndpoint) return null; try{ const res = await fetch(tempInviteEndpoint,{method:'POST',headers:{'Content-Type':'application/json'}}); if(!res.ok) throw new Error('temp'); const j = await res.json(); return {invite: j.invite || j.url || (j.code? `https://discord.gg/${j.code}`:null), expires_in: j.expires_in}; }catch(e){console.warn('temp invite error',e); return null;} }
+    // starfield + repulse + parallax
+    (function(){ try{ const can = starCan; const ctx = can.getContext('2d'); function resize(){ can.width = can.offsetWidth * devicePixelRatio; can.height = can.offsetHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); burstCan.width = burstCan.offsetWidth * devicePixelRatio; burstCan.height = burstCan.offsetHeight * devicePixelRatio; bctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+        resize(); window.addEventListener('resize', resize);
+        const PART = 48; const stars = []; function R(a,b){return Math.random()*(b-a)+a}
+        for(let i=0;i<PART;i++) stars.push({x:R(0,can.offsetWidth), y:R(0,can.offsetHeight), r:R(0.3,1.6), vx:R(-0.03,0.03), vy:R(0.02,0.22), bx:R(-0.03,0.03), by:R(0.02,0.22)});
+        let mouse = {x:-9999,y:-9999,active:false}; stage.addEventListener('mousemove', e=>{ const r = stage.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; }); stage.addEventListener('mouseenter', ()=>mouse.active=true); stage.addEventListener('mouseleave', ()=>{ mouse.active=false; mouse.x=-9999; mouse.y=-9999 });
+        const layers = document.querySelectorAll('.layer'); function parallax(){ const r = stage.getBoundingClientRect(); const cx = r.width/2; const cy = r.height/2; const mx = mouse.x===-9999?cx:mouse.x; const my = mouse.y===-9999?cy:mouse.y; const rx = (mx-cx)/cx; const ry = (my-cy)/cy; layers.forEach((el,i)=>{ const depth=(i+1)/14; el.style.transform = `translate3d(${-rx*depth*10}px, ${-ry*depth*8}px, 0) scale(${1 - i*0.002})`; }); }
+        let last=0; function draw(t){ if(t-last<28){ requestAnimationFrame(draw); return; } last=t; ctx.clearRect(0,0,can.width,can.height); ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,0,can.offsetWidth,can.offsetHeight);
+          for(const s of stars){ s.x += s.vx; s.y += s.vy; if(mouse.active){ const dx = s.x - mouse.x; const dy = s.y - mouse.y; const d2 = dx*dx + dy*dy; const R0 = 90; if(d2 < R0*R0){ const f = (1 - (Math.sqrt(d2)/R0)); s.vx += (dx/d2) * f * 0.8; s.vy += (dy/d2) * f * 0.8; } }
+            s.vx *= 0.985; s.vy = s.vy*0.985 + s.by*0.015; if(s.y > can.offsetHeight + 6){ s.y = -6; s.x = Math.random()*can.offsetWidth; } if(s.x < -10) s.x = can.offsetWidth + 10; if(s.x > can.offsetWidth + 10) s.x = -10; const g = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*6); g.addColorStop(0, `rgba(255,255,255,${0.85*(s.r/1.6)})`); g.addColorStop(0.6, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); }
+          parallax(); requestAnimationFrame(draw); }
+        requestAnimationFrame(draw);
+      }catch(e){ console.warn('starfield init fail', e); } })();
 
-  // copy invite
-  copyBtn.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(currentInvite); copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200);}catch(e){copyBtn.textContent='Failed'}});
+    // QR modal
+    qrBtn.addEventListener('click', async ()=>{ if(tempInviteEndpoint){ try{ const t = await fetch(tempInviteEndpoint,{method:'POST'}); if(t.ok){ const j = await t.json(); if(j.invite) currentInvite = j.invite; } }catch(e){ console.warn('temp invite failed', e); } }
+      openQr(); });
+    function openQr(){ try{ qrModal.style.display='flex'; qrcodeWrap.innerHTML=''; new QRCode(qrcodeWrap,{text:currentInvite, width:160, height:160, colorDark:'#000000', colorLight:'#ffffff00'}); }catch(e){ console.warn('openQr', e); } }
+    document.getElementById('closeQr').addEventListener('click', ()=>{ qrModal.style.display='none'; qrcodeWrap.innerHTML=''; });
 
-  // theme button cycles a few presets
-  const themes = [{a:'#7f00ff',b:'#ff4bd6'},{a:'#00b3cc',b:'#5de0a3'},{a:'#ff6a00',b:'#ffd54f'}]; let tidx=0; document.getElementById('themeBtn').addEventListener('click', ()=>{ tidx=(tidx+1)%themes.length; document.documentElement.style.setProperty('--accent-1',themes[tidx].a); document.documentElement.style.setProperty('--accent-2',themes[tidx].b); });
+    // Copy
+    copyBtn.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(currentInvite); copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200);}catch(e){ copyBtn.textContent='Failed'; setTimeout(()=>copyBtn.textContent='Copy',1200); } });
 
-  // init ring + spark
-  setRing(0.02); drawSpark(history);
+    // theme
+    const themes = [{a:'#7f00ff',b:'#ff4bd6'},{a:'#00b3cc',b:'#5de0a3'},{a:'#ff6a00',b:'#ffd54f'}]; let tidx=0; document.getElementById('themeBtn').addEventListener('click', ()=>{ tidx=(tidx+1)%themes.length; document.documentElement.style.setProperty('--accent-1',themes[tidx].a); document.documentElement.style.setProperty('--accent-2',themes[tidx].b); });
 
-  // expose for debug
-  window.__chill = { fetchWidget, spawnBurst:burst };
+    // init visuals
+    setRing(0.02); drawSpark(history);
+
+    // start fetch
+    fetchWidget(); setInterval(fetchWidget, 15000);
+
+    // helpers
+    function setRing(pct){ try{ const circle = ring; const total = 2*Math.PI*44; const dash = total; const off = dash * (1 - pct); circle.setAttribute('stroke-dasharray', dash); circle.setAttribute('stroke-dashoffset', off); circle.style.filter = `drop-shadow(0 0 ${4 + pct*12}px rgba(127,0,255,0.16))`; }catch(e){} }
+    function pulseRing(){ try{ ring.style.transition='transform .48s cubic-bezier(.2,.9,.3,1)'; ring.style.transform='scale(1.08)'; setTimeout(()=>{ ring.style.transform=''; ring.style.transition=''; },480); }catch(e){} }
+    function burst(n){ try{ spawnBurst(n); }catch(e){console.warn(e);} }
+
+    function spawnBurst(n){ const rect = stage.getBoundingClientRect(); const cx = rect.width * 0.14; const cy = rect.height * 0.18; burstCan.width = burstCan.offsetWidth * devicePixelRatio; burstCan.height = burstCan.offsetHeight * devicePixelRatio; bctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2; const sp=1.6+Math.random()*3; bparts.push({x:cx + (Math.random()-0.5)*6, y:cy + (Math.random()-0.5)*6, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:50+Math.random()*40, r:1+Math.random()*2, hue:250+Math.random()*100}); } if(!bRunning){ bRunning=true; requestAnimationFrame(bLoop); } }
+
+    // show/hide helpers
+    function showLoading(v){ loading.style.display = v ? 'flex' : 'none'; }
+    function showError(msg){ errorBanner.textContent = msg; errorBanner.style.display = 'block'; }
+    function hideError(){ errorBanner.style.display = 'none'; }
+
+    // demo apply if nothing
+    function applyDemo(){ const demoCount = Math.floor(Math.random()*80)+6; const d = {presence_count: demoCount, instant_invite: fallbackInvite}; apply(d); }
+
+    // expose limited debug
+    window.__chill = { fetchWidget, applyDemo };
+  });
   </script>
 </body>
 </html>
